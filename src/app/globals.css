@@ -1,16 +1,11 @@
 @import "tailwindcss";
 
-:root {
-  --background: #F3F4F6;
-  --foreground: #1F2937;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --color-primary: #930137;
   --color-primary-light: #B01A4F;
   --color-primary-pale: #F9E8EE;
+  --color-background: #F3F4F6;
+  --color-foreground: #1F2937;
   --color-success: #16A34A;
   --color-error: #DC2626;
   --color-warning: #F59E0B;
@@ -18,22 +13,26 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #F3F4F6;
+  color: #1F2937;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   accent-color: #930137;
 }
 
 /* Override browser default blue on all form elements */
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
   accent-color: #930137;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline-color: #930137;
 }
 
-/* Kill any remaining Tailwind/browser default blue */
 *:focus {
   outline-color: #930137;
 }
@@ -46,4 +45,3 @@ input:focus, select:focus, textarea:focus {
 a {
   color: inherit;
 }
-
