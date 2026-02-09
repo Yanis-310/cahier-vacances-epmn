@@ -8,11 +8,21 @@ export default function Navbar() {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Extract initials from user name
+  const initials = session?.user?.name
+    ? session.user.name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
+    : "?";
+
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+          {/* Left — Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold text-primary">EPMN</span>
             <span className="hidden sm:inline text-sm text-foreground/60">
@@ -20,28 +30,44 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-6">
+          {/* Desktop */}
+          <div className="hidden md:flex items-center gap-1">
             {session ? (
               <>
+                {/* Navigation links */}
                 <Link
                   href="/exercises"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
                 >
                   Évaluation
                 </Link>
-                <span className="text-sm text-foreground/50">
-                  {session.user?.name}
-                </span>
+
+                {/* Separator */}
+                <div className="w-px h-5 bg-foreground/10 mx-3" />
+
+                {/* User area — grouped on the right */}
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors cursor-pointer"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <span className="text-white text-xs font-semibold leading-none">
+                      {initials}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-foreground/70">
+                    {session.user?.name}
+                  </span>
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="ml-1 px-3 py-2 rounded-lg text-sm text-foreground/40 hover:text-primary hover:bg-primary-pale/50 transition-colors cursor-pointer"
                 >
                   Déconnexion
                 </button>
@@ -50,13 +76,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
                 >
                   Se connecter
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-light transition-colors"
+                  className="ml-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-light transition-colors"
                 >
                   Créer un compte
                 </Link>
@@ -67,7 +93,7 @@ export default function Navbar() {
           {/* Mobile burger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 text-foreground/70"
+            className="md:hidden p-2 text-foreground/70 cursor-pointer"
             aria-label="Menu"
           >
             <svg
@@ -97,24 +123,52 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden pb-4 space-y-2">
+          <div className="md:hidden pb-4 space-y-1">
             {session ? (
               <>
+                {/* User info header */}
+                <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-foreground/5">
+                  <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold leading-none">
+                      {initials}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      {session.user?.name}
+                    </p>
+                    <p className="text-xs text-foreground/40">
+                      {session.user?.email}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Nav links */}
                 <Link
                   href="/exercises"
-                  className="block px-3 py-2 rounded-lg text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
-                  className="block px-3 py-2 rounded-lg text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
                 >
                   Évaluation
                 </Link>
+                <Link
+                  href="/profile"
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                >
+                  Mon profil
+                </Link>
+
+                {/* Separator */}
+                <div className="border-t border-foreground/5 my-1" />
+
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="block w-full text-left px-3 py-2 rounded-lg text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  className="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-foreground/40 hover:bg-primary-pale hover:text-primary transition-colors cursor-pointer"
                 >
                   Déconnexion
                 </button>
@@ -123,13 +177,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="block px-3 py-2 rounded-lg text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
                 >
                   Se connecter
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-3 py-2 rounded-lg bg-primary text-white text-center hover:bg-primary-light transition-colors"
+                  className="block px-3 py-2.5 rounded-lg bg-primary text-white text-center text-sm hover:bg-primary-light transition-colors"
                 >
                   Créer un compte
                 </Link>

@@ -28,7 +28,7 @@ export default async function EvaluationResultPage({
   }
 
   // Load exercises for question details
-  const questionIds = evaluation.questionIds as QuestionRef[];
+  const questionIds = evaluation.questionIds as unknown as QuestionRef[];
   const exerciseIds = [...new Set(questionIds.map((q) => q.exerciseId))];
   const exercises = await prisma.exercise.findMany({
     where: { id: { in: exerciseIds } },

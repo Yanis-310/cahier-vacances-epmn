@@ -33,6 +33,11 @@ input:focus, select:focus, textarea:focus {
   outline-color: #930137;
 }
 
+/* Kill any remaining Tailwind/browser default blue */
+*:focus {
+  outline-color: #930137;
+}
+
 ::selection {
   background-color: #930137;
   color: white;
@@ -41,3 +46,4 @@ input:focus, select:focus, textarea:focus {
 a {
   color: inherit;
 }
+

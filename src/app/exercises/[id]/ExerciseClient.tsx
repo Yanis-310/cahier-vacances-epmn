@@ -123,8 +123,8 @@ export default function ExerciseClient({
     if (isLabyrinth) {
       const willBeComplete =
         questions.every((q) => {
-          const ans = q.id === questionId ? value : updated[q.id];
-          const correct = exercise.answers[q.id] as string;
+          const ans = q.id === questionId ? value : (updated as Record<number, string>)[q.id];
+          const correct = (exercise.answers as Record<number, string>)[q.id];
           return !!ans && ans === correct;
         });
       saveAnswers(updated, willBeComplete);
