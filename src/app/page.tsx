@@ -1,65 +1,123 @@
-import Image from "next/image";
+import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Navbar />
+      <main>
+        {/* Hero */}
+        <section className="bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
+              Cahier de Vacances des{" "}
+              <span className="text-primary">Médiateurs Professionnels</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-foreground/60 max-w-2xl mx-auto mb-10">
+              Révisez et approfondissez vos connaissances en médiation
+              professionnelle grâce à des exercices interactifs, à votre rythme.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/register"
+                className="bg-primary text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-light transition-colors"
+              >
+                Commencer gratuitement
+              </Link>
+              <Link
+                href="/login"
+                className="border-2 border-primary text-primary px-8 py-3 rounded-lg text-lg font-medium hover:bg-primary-pale transition-colors"
+              >
+                Se connecter
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Features */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-primary-pale rounded-lg flex items-center justify-center mb-4">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">30 exercices</h3>
+              <p className="text-foreground/60">
+                Des exercices variés couvrant tous les fondamentaux de la
+                médiation professionnelle.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-primary-pale rounded-lg flex items-center justify-center mb-4">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Mode évaluation</h3>
+              <p className="text-foreground/60">
+                Testez-vous avec des évaluations aléatoires de 20 à 25
+                questions et suivez votre progression.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-primary-pale rounded-lg flex items-center justify-center mb-4">
+                <svg
+                  className="w-6 h-6 text-primary"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                Sauvegarde automatique
+              </h3>
+              <p className="text-foreground/60">
+                Votre progression est sauvegardée automatiquement. Reprenez où
+                vous en étiez, à tout moment.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-white border-t border-foreground/10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-sm text-foreground/40">
+            © {new Date().getFullYear()} EPMN — École Professionnelle de la
+            Médiation et de la Négociation
+          </div>
+        </footer>
       </main>
-    </div>
+    </>
   );
 }
