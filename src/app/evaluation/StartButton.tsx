@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function StartButton() {
+export default function StartButton({
+  variant = "primary",
+}: {
+  variant?: "primary" | "outline";
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -22,9 +26,13 @@ export default function StartButton() {
     <button
       onClick={handleStart}
       disabled={loading}
-      className="bg-primary text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50"
+      className={`px-6 py-3 rounded-xl font-medium transition-colors disabled:opacity-50 cursor-pointer ${
+        variant === "outline"
+          ? "border border-foreground/15 text-foreground/60 hover:text-primary hover:border-primary/30 bg-white"
+          : "bg-primary text-white hover:bg-primary-light"
+      }`}
     >
-      {loading ? "Préparation..." : "Démarrer une évaluation"}
+      {loading ? "Préparation..." : "Nouvelle évaluation"}
     </button>
   );
 }

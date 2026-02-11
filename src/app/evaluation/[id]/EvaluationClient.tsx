@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -31,6 +31,13 @@ export default function EvaluationClient({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const currentQuestion = questions[currentIndex];
+  const isFirstQuestion = currentIndex === 0;
+  const isLastQuestion = currentIndex === total - 1;
 
   function handleAnswer(key: string, value: string) {
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -44,6 +51,30 @@ export default function EvaluationClient({
   const answeredCount = Object.keys(answers).filter(
     (k) => answers[k]?.trim()
   ).length;
+
+  // Keyboard navigation
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowRight" && currentIndex < total - 1) {
+        navigateTo(currentIndex + 1, "left");
+      } else if (e.key === "ArrowLeft" && currentIndex > 0) {
+        navigateTo(currentIndex - 1, "right");
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentIndex, total]);
+
+  function navigateTo(index: number, direction: "left" | "right") {
+    if (isAnimating || index === currentIndex) return;
+    setSlideDirection(direction);
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setSlideDirection(null);
+      setIsAnimating(false);
+    }, 200);
+  }
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -68,154 +99,219 @@ export default function EvaluationClient({
   }
 
   return (
-    <div>
+    <div className="exercise-container">
+      {/* Back link */}
+      <Link
+        href="/evaluation"
+        className="inline-flex items-center gap-1.5 text-sm text-foreground/40 hover:text-primary transition-colors mb-6"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+          <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Retour
+      </Link>
+
       {/* Header */}
       <div className="mb-8">
-        <Link
-          href="/evaluation"
-          className="text-sm text-foreground/40 hover:text-primary transition-colors"
-        >
-          ← Retour
-        </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold mt-3">
-          <span className="text-primary">Évaluation</span> — {total} questions
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <span className="text-primary">Évaluation</span>
+          <span className="text-foreground/20 mx-2">—</span>
+          <span className="text-foreground/80">{total} questions</span>
         </h1>
-        <div className="flex items-center gap-3 mt-3">
-          <span className="text-sm text-foreground/40">
-            {answeredCount}/{total} répondue{answeredCount > 1 ? "s" : ""}
-          </span>
-          {/* Progress bar */}
-          <div className="flex-1 h-2 bg-foreground/10 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-300"
-              style={{
-                width: total > 0 ? `${(answeredCount / total) * 100}%` : "0%",
-              }}
-            />
-          </div>
-        </div>
       </div>
 
-      {/* Questions */}
-      <div className="space-y-4">
-        {questions.map((q) => (
+      {/* Progress bar */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1 h-1 bg-foreground/[0.06] rounded-full overflow-hidden">
           <div
-            key={q.key}
-            className="bg-white rounded-lg p-5 shadow-sm border-2 border-transparent"
-          >
-            <div className="flex items-start gap-3 mb-1">
-              <span className="text-sm font-medium text-foreground/40 mt-0.5">
-                {q.index}.
-              </span>
-              <div>
-                <span className="text-xs text-primary/60 font-medium">
-                  Ex. {q.exerciseNumber} — {q.exerciseTitle}
-                </span>
-                <p className="font-medium mt-1">{q.questionText}</p>
-              </div>
-            </div>
-
-            <div className="ml-8 mt-3">
-              {/* Single choice - dropdown */}
-              {q.exerciseType === "single_choice" && (
-                <select
-                  value={answers[q.key] || ""}
-                  onChange={(e) => handleAnswer(q.key, e.target.value)}
-                  className="w-full sm:w-auto px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white"
-                >
-                  <option value="">— Choisir —</option>
-                  {q.options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {/* QCM - radio buttons */}
-              {q.exerciseType === "qcm" && (
-                <div className="space-y-2">
-                  {q.qcmOptions.map((opt) => (
-                    <label
-                      key={opt.label}
-                      className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                        answers[q.key] === opt.label
-                          ? "bg-primary-pale"
-                          : "hover:bg-foreground/5"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={`eval-${q.key}`}
-                        value={opt.label}
-                        checked={answers[q.key] === opt.label}
-                        onChange={() => handleAnswer(q.key, opt.label)}
-                        className="mt-1 accent-primary"
-                      />
-                      <span>
-                        <span className="font-medium">{opt.label}.</span>{" "}
-                        {opt.text}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {/* Multi select - checkbox */}
-              {q.exerciseType === "multi_select" && (
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={answers[q.key] === "true"}
-                    onChange={() => handleMultiSelectToggle(q.key)}
-                    className="w-5 h-5 accent-primary rounded"
-                  />
-                  <span className="text-sm">Bonne posture pour le MP</span>
-                </label>
-              )}
-
-              {/* True / False */}
-              {q.exerciseType === "true_false" && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleAnswer(q.key, "Vrai")}
-                    className={`px-5 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      answers[q.key] === "Vrai"
-                        ? "border-primary bg-primary text-white"
-                        : "border-foreground/20 hover:border-primary/50"
-                    }`}
-                  >
-                    Vrai
-                  </button>
-                  <button
-                    onClick={() => handleAnswer(q.key, "Faux")}
-                    className={`px-5 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      answers[q.key] === "Faux"
-                        ? "border-primary bg-primary text-white"
-                        : "border-foreground/20 hover:border-primary/50"
-                    }`}
-                  >
-                    Faux
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+            className="h-full bg-primary/80 rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: total > 0 ? `${(answeredCount / total) * 100}%` : "0%",
+            }}
+          />
+        </div>
+        <span className="text-xs text-foreground/30 tabular-nums shrink-0">
+          {answeredCount}/{total}
+        </span>
       </div>
 
-      {/* Submit */}
-      <div className="mt-8 flex flex-col items-end gap-3">
-        {error && (
-          <p className="text-error text-sm font-medium">{error}</p>
-        )}
-        <button
-          onClick={handleSubmit}
-          disabled={submitting}
-          className="bg-primary text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50"
+      {/* Question card */}
+      {currentQuestion && (
+        <div
+          className={`exercise-card ${slideDirection === "left"
+              ? "exercise-slide-out-left"
+              : slideDirection === "right"
+                ? "exercise-slide-out-right"
+                : "exercise-slide-in"
+            }`}
         >
-          {submitting ? "Envoi en cours..." : "Soumettre mes réponses"}
+          {/* Question number badge + source */}
+          <div className="flex items-center gap-2.5 mb-2">
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold">
+              {currentIndex + 1}
+            </span>
+            <span className="text-xs text-foreground/35 font-medium">
+              Question {currentIndex + 1} sur {total}
+            </span>
+          </div>
+
+          {/* Exercise source */}
+          <p className="text-xs text-primary/50 font-medium ml-[34px] mb-4">
+            Ex. {currentQuestion.exerciseNumber} — {currentQuestion.exerciseTitle}
+          </p>
+
+          {/* Question text */}
+          <p className="text-[16px] font-medium leading-relaxed text-foreground/90 mb-6">
+            {currentQuestion.questionText}
+          </p>
+
+          {/* ─── SINGLE CHOICE: Pills ─── */}
+          {currentQuestion.exerciseType === "single_choice" && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {currentQuestion.options.map((opt) => {
+                const isSelected = answers[currentQuestion.key] === opt;
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => handleAnswer(currentQuestion.key, opt)}
+                    className={`exercise-pill ${isSelected ? "exercise-pill-active" : ""}`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ─── QCM: Option cards ─── */}
+          {currentQuestion.exerciseType === "qcm" && (
+            <div className="space-y-2">
+              {currentQuestion.qcmOptions.map((opt) => {
+                const isSelected = answers[currentQuestion.key] === opt.label;
+                return (
+                  <button
+                    key={opt.label}
+                    onClick={() => handleAnswer(currentQuestion.key, opt.label)}
+                    className={`exercise-option-card ${isSelected ? "exercise-option-card-active" : ""}`}
+                  >
+                    <span className="exercise-option-label">{opt.label}</span>
+                    <span className="text-[14px] leading-snug">{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ─── MULTI SELECT: Checkbox card ─── */}
+          {currentQuestion.exerciseType === "multi_select" && (
+            <button
+              onClick={() => handleMultiSelectToggle(currentQuestion.key)}
+              className={`exercise-option-card ${answers[currentQuestion.key] === "true" ? "exercise-option-card-active" : ""
+                }`}
+            >
+              <span className={`exercise-checkbox ${answers[currentQuestion.key] === "true" ? "exercise-checkbox-active" : ""
+                }`}>
+                {answers[currentQuestion.key] === "true" && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span className="text-[14px] leading-snug">Bonne posture pour le MP</span>
+            </button>
+          )}
+
+          {/* ─── TRUE / FALSE: Two large cards ─── */}
+          {currentQuestion.exerciseType === "true_false" && (
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => handleAnswer(currentQuestion.key, "Vrai")}
+                className={`exercise-tf-card ${answers[currentQuestion.key] === "Vrai" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="mb-1">
+                  <path d="M4 10L8.5 14.5L16 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Vrai
+              </button>
+              <button
+                onClick={() => handleAnswer(currentQuestion.key, "Faux")}
+                className={`exercise-tf-card ${answers[currentQuestion.key] === "Faux" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="mb-1">
+                  <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Faux
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="mt-3 text-xs text-error text-center">{error}</div>
+      )}
+
+      {/* Navigation footer */}
+      <div className="mt-6 flex items-center justify-between">
+        {/* Previous button */}
+        <button
+          onClick={() => navigateTo(currentIndex - 1, "right")}
+          disabled={isFirstQuestion}
+          className="exercise-nav-btn"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="hidden sm:inline">Précédent</span>
         </button>
+
+        {/* Dots */}
+        <div className="flex items-center gap-1 flex-wrap justify-center max-w-[60%]">
+          {questions.map((q, i) => {
+            const isAnswered = !!answers[q.key]?.trim();
+            const isCurrent = i === currentIndex;
+            return (
+              <button
+                key={q.key}
+                onClick={() => navigateTo(i, i > currentIndex ? "left" : "right")}
+                className={`exercise-dot ${isCurrent
+                    ? "exercise-dot-current"
+                    : isAnswered
+                      ? "exercise-dot-answered"
+                      : "exercise-dot-empty"
+                  }`}
+                aria-label={`Question ${i + 1}`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Next / Submit button */}
+        {isLastQuestion ? (
+          <button
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="exercise-nav-btn exercise-nav-btn-primary"
+          >
+            <span>{submitting ? "Envoi..." : "Soumettre"}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={() => navigateTo(currentIndex + 1, "left")}
+            className="exercise-nav-btn"
+          >
+            <span className="hidden sm:inline">Suivant</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );

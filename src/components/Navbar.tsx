@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -65,12 +65,6 @@ export default function Navbar() {
                     {session.user?.name}
                   </span>
                 </Link>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="ml-1 px-3 py-2 rounded-lg text-sm text-foreground/40 hover:text-primary hover:bg-primary-pale/50 transition-colors cursor-pointer"
-                >
-                  Déconnexion
-                </button>
               </>
             ) : (
               <>
@@ -163,15 +157,6 @@ export default function Navbar() {
                   Mon profil
                 </Link>
 
-                {/* Separator */}
-                <div className="border-t border-foreground/5 my-1" />
-
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="block w-full text-left px-3 py-2.5 rounded-lg text-sm text-foreground/40 hover:bg-primary-pale hover:text-primary transition-colors cursor-pointer"
-                >
-                  Déconnexion
-                </button>
               </>
             ) : (
               <>

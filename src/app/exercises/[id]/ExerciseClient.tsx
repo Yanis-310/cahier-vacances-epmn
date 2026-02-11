@@ -33,6 +33,7 @@ interface ExerciseData {
 interface Props {
   exercise: ExerciseData;
   savedAnswers: Record<string, string>;
+  isCompleted: boolean;
   prevId: string | null;
   nextId: string | null;
 }
@@ -40,21 +41,27 @@ interface Props {
 export default function ExerciseClient({
   exercise,
   savedAnswers,
+  isCompleted,
   prevId,
   nextId,
 }: Props) {
   const [userAnswers, setUserAnswers] =
     useState<Record<string, string>>(savedAnswers);
-  const [showCorrection, setShowCorrection] = useState(false);
+  const [showCorrection, setShowCorrection] = useState(isCompleted);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const questions = exercise.content.questions || [];
   const options = exercise.content.options || [];
   const isLabyrinth = exercise.type === "labyrinth";
+  const totalQuestions = questions.length;
+  const currentQuestion = questions[currentIndex];
 
-  // Labyrinth helpers
+  // Labyrinth helpers (kept as-is)
   function isLabStepCorrect(questionId: number): boolean {
     const userAnswer = userAnswers[questionId];
     const correctAnswer = exercise.answers[questionId] as string;
@@ -114,19 +121,42 @@ export default function ExerciseClient({
     };
   }, []);
 
+  // Keyboard navigation
+  useEffect(() => {
+    if (isLabyrinth) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "ArrowRight" && currentIndex < totalQuestions - 1) {
+        navigateTo(currentIndex + 1, "left");
+      } else if (e.key === "ArrowLeft" && currentIndex > 0) {
+        navigateTo(currentIndex - 1, "right");
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentIndex, totalQuestions, isLabyrinth]);
+
+  function navigateTo(index: number, direction: "left" | "right") {
+    if (isAnimating || index === currentIndex) return;
+    setSlideDirection(direction);
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setSlideDirection(null);
+      setIsAnimating(false);
+    }, 200);
+  }
+
   function handleAnswer(questionId: number, value: string) {
     const updated = { ...userAnswers, [questionId]: value };
     setUserAnswers(updated);
     setShowCorrection(false);
 
-    // For labyrinth, auto-complete when all steps are correct
     if (isLabyrinth) {
-      const willBeComplete =
-        questions.every((q) => {
-          const ans = q.id === questionId ? value : (updated as Record<number, string>)[q.id];
-          const correct = (exercise.answers as Record<number, string>)[q.id];
-          return !!ans && ans === correct;
-        });
+      const willBeComplete = questions.every((q) => {
+        const ans = q.id === questionId ? value : (updated as Record<number, string>)[q.id];
+        const correct = (exercise.answers as Record<number, string>)[q.id];
+        return !!ans && ans === correct;
+      });
       saveAnswers(updated, willBeComplete);
     } else if (exercise.type === "free_text") {
       scheduleSave(updated);
@@ -151,7 +181,6 @@ export default function ExerciseClient({
 
   function getStatus(questionId: number): "correct" | "incorrect" | null {
     if (!showCorrection) return null;
-
     if (exercise.type === "free_text") return null;
 
     if (exercise.type === "multi_select") {
@@ -171,57 +200,36 @@ export default function ExerciseClient({
     (k) => userAnswers[k]?.trim()
   ).length;
 
-  return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <Link
-          href="/exercises"
-          className="text-sm text-foreground/40 hover:text-primary transition-colors"
-        >
-          ← Retour aux exercices
-        </Link>
-        <h1 className="text-2xl sm:text-3xl font-bold mt-3">
-          <span className="text-primary">Exercice {exercise.number}</span> —{" "}
-          {exercise.title}
-        </h1>
-        {exercise.content.instruction && (
-          <p className="text-foreground/60 mt-2">
-            {exercise.content.instruction}
-          </p>
-        )}
-        {exercise.content.legend && (
-          <p className="text-sm text-foreground/40 mt-1 italic">
-            {exercise.content.legend}
-          </p>
-        )}
-        {!isLabyrinth && (
-          <div className="flex items-center gap-3 mt-3">
-            <span className="text-sm text-foreground/40">
-              {answeredCount}/{questions.length} répondu
-              {answeredCount > 1 ? "es" : ""}
-            </span>
-            {saving && (
-              <span className="text-xs text-foreground/30">Sauvegarde...</span>
-            )}
-            {saveError && (
-              <span className="text-xs text-error">{saveError}</span>
-            )}
+  // ─── LABYRINTH RENDERING (preserved as-is) ───
+  if (isLabyrinth) {
+    return (
+      <div>
+        <div className="mb-8">
+          <Link
+            href="/exercises"
+            className="text-sm text-foreground/40 hover:text-primary transition-colors"
+          >
+            ← Retour aux exercices
+          </Link>
+          <h1 className="text-2xl sm:text-3xl font-bold mt-3">
+            <span className="text-primary">Exercice {exercise.number}</span> —{" "}
+            {exercise.title}
+          </h1>
+          {exercise.content.instruction && (
+            <p className="text-foreground/60 mt-2">
+              {exercise.content.instruction}
+            </p>
+          )}
+        </div>
+
+        {exercise.content.scenario && (
+          <div className="bg-primary-pale/50 rounded-lg p-4 mb-6">
+            <p className="text-sm text-foreground/70">
+              {exercise.content.scenario}
+            </p>
           </div>
         )}
-      </div>
 
-      {/* Labyrinth scenario */}
-      {isLabyrinth && exercise.content.scenario && (
-        <div className="bg-primary-pale/50 rounded-lg p-4 mb-6">
-          <p className="text-sm text-foreground/70">
-            {exercise.content.scenario}
-          </p>
-        </div>
-      )}
-
-      {/* Labyrinth progress */}
-      {isLabyrinth && (
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-2 bg-foreground/10 rounded-full overflow-hidden">
             <div
@@ -241,53 +249,43 @@ export default function ExerciseClient({
             <span className="text-xs text-foreground/30">Sauvegarde...</span>
           )}
         </div>
-      )}
 
-      {/* Questions */}
-      <div className="space-y-4">
-        {questions.map((q, qIndex) => {
-          const status = getStatus(q.id);
-
-          // Labyrinth rendering
-          if (isLabyrinth) {
+        <div className="space-y-4">
+          {questions.map((q, qIndex) => {
             const unlocked = isLabStepUnlocked(qIndex);
             const answered = !!userAnswers[q.id];
             const correct = isLabStepCorrect(q.id);
 
             return (
               <div key={q.id}>
-                {/* Connector line */}
                 {qIndex > 0 && (
                   <div className="flex justify-center my-2">
                     <div
-                      className={`w-0.5 h-6 ${
-                        isLabStepCorrect(questions[qIndex - 1].id)
-                          ? "bg-success/50"
-                          : "bg-foreground/10"
-                      }`}
+                      className={`w-0.5 h-6 ${isLabStepCorrect(questions[qIndex - 1].id)
+                        ? "bg-success/50"
+                        : "bg-foreground/10"
+                        }`}
                     />
                   </div>
                 )}
                 <div
-                  className={`bg-white rounded-lg p-5 shadow-sm border-2 transition-all duration-300 ${
-                    !unlocked
-                      ? "opacity-40 pointer-events-none border-foreground/5"
-                      : correct
+                  className={`bg-white rounded-lg p-5 shadow-sm border-2 transition-all duration-300 ${!unlocked
+                    ? "opacity-40 pointer-events-none border-foreground/5"
+                    : correct
                       ? "border-success/50"
                       : answered
-                      ? "border-error/50"
-                      : "border-transparent"
-                  }`}
+                        ? "border-error/50"
+                        : "border-transparent"
+                    }`}
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <span
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                        correct
-                          ? "bg-success text-white"
-                          : unlocked
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${correct
+                        ? "bg-success text-white"
+                        : unlocked
                           ? "bg-primary text-white"
                           : "bg-foreground/10 text-foreground/40"
-                      }`}
+                        }`}
                     >
                       {correct ? "\u2713" : qIndex + 1}
                     </span>
@@ -338,199 +336,566 @@ export default function ExerciseClient({
                 </div>
               </div>
             );
-          }
-
-          // Standard rendering for other types
-          return (
-            <div
-              key={q.id}
-              className={`bg-white rounded-lg p-5 shadow-sm border-2 transition-colors ${
-                status === "correct"
-                  ? "border-success/50"
-                  : status === "incorrect"
-                  ? "border-error/50"
-                  : "border-transparent"
-              }`}
-            >
-              <div className="flex items-start gap-3 mb-3">
-                <span className="text-sm font-medium text-foreground/40 mt-0.5">
-                  {q.id}.
-                </span>
-                <p className="font-medium">{q.text}</p>
-              </div>
-
-              {/* Single choice with dropdown */}
-              {exercise.type === "single_choice" && (
-                <select
-                  value={userAnswers[q.id] || ""}
-                  onChange={(e) => handleAnswer(q.id, e.target.value)}
-                  className="w-full sm:w-auto px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary bg-white"
-                >
-                  <option value="">— Choisir —</option>
-                  {options.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {/* QCM with radio buttons */}
-              {exercise.type === "qcm" && q.options && (
-                <div className="space-y-2">
-                  {q.options.map((opt) => (
-                    <label
-                      key={opt.label}
-                      className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                        userAnswers[q.id] === opt.label
-                          ? "bg-primary-pale"
-                          : "hover:bg-foreground/5"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={`q-${q.id}`}
-                        value={opt.label}
-                        checked={userAnswers[q.id] === opt.label}
-                        onChange={() => handleAnswer(q.id, opt.label)}
-                        className="mt-1 accent-primary"
-                      />
-                      <span>
-                        <span className="font-medium">{opt.label}.</span>{" "}
-                        {opt.text}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {/* Multi select with checkboxes */}
-              {exercise.type === "multi_select" && (
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={userAnswers[q.id] === "true"}
-                    onChange={() => handleMultiSelectToggle(q.id)}
-                    className="w-5 h-5 accent-primary rounded"
-                  />
-                  <span className="text-sm">Bonne posture pour le MP</span>
-                </label>
-              )}
-
-              {/* True / False */}
-              {exercise.type === "true_false" && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleAnswer(q.id, "Vrai")}
-                    className={`px-5 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      userAnswers[q.id] === "Vrai"
-                        ? "border-primary bg-primary text-white"
-                        : "border-foreground/20 hover:border-primary/50"
-                    }`}
-                  >
-                    Vrai
-                  </button>
-                  <button
-                    onClick={() => handleAnswer(q.id, "Faux")}
-                    className={`px-5 py-2 rounded-lg border-2 font-medium transition-colors ${
-                      userAnswers[q.id] === "Faux"
-                        ? "border-primary bg-primary text-white"
-                        : "border-foreground/20 hover:border-primary/50"
-                    }`}
-                  >
-                    Faux
-                  </button>
-                </div>
-              )}
-
-              {/* Free text */}
-              {exercise.type === "free_text" && (
-                <textarea
-                  value={userAnswers[q.id] || ""}
-                  onChange={(e) => handleAnswer(q.id, e.target.value)}
-                  onBlur={() => saveAnswers(userAnswers)}
-                  rows={2}
-                  placeholder="Votre réponse..."
-                  className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-y"
-                />
-              )}
-
-              {/* Show correction */}
-              {showCorrection && (
-                <div className="mt-3">
-                  {status === "correct" && (
-                    <p className="text-sm text-success font-medium">
-                      Bonne réponse !
-                    </p>
-                  )}
-                  {status === "incorrect" && exercise.type !== "multi_select" && (
-                    <p className="text-sm text-error">
-                      Réponse attendue :{" "}
-                      <span className="font-medium">
-                        {exercise.answers[q.id] as string}
-                      </span>
-                    </p>
-                  )}
-                  {status === "incorrect" && exercise.type === "multi_select" && (
-                    <p className="text-sm text-error">
-                      {(exercise.answers as { correctIds: number[] }).correctIds.includes(q.id)
-                        ? "Cette proposition est une bonne posture."
-                        : "Cette proposition n'est pas une bonne posture."}
-                    </p>
-                  )}
-                  {exercise.type === "free_text" && (
-                    <div className="text-sm bg-primary-pale/50 rounded-lg p-3 mt-1">
-                      <span className="font-medium text-primary">
-                        Réponse attendue :
-                      </span>{" "}
-                      {exercise.answers[q.id] as string}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Labyrinth success */}
-      {isLabyrinth && allLabStepsCorrect && (
-        <div className="mt-6 bg-success/10 rounded-lg p-6 text-center">
-          <p className="text-success font-bold text-lg">
-            Bravo ! Vous avez trouvé le bon chemin !
-          </p>
+          })}
         </div>
-      )}
 
-      {/* Actions */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex gap-3">
-          {prevId && (
-            <Link
-              href={`/exercises/${prevId}`}
-              className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
-            >
-              ← Précédent
-            </Link>
-          )}
+        {allLabStepsCorrect && (
+          <div className="mt-6 bg-success/10 rounded-lg p-6 text-center">
+            <p className="text-success font-bold text-lg">
+              Bravo ! Vous avez trouvé le bon chemin !
+            </p>
+          </div>
+        )}
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex gap-3">
+            {prevId && (
+              <Link
+                href={`/exercises/${prevId}`}
+                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
+              >
+                ← Précédent
+              </Link>
+            )}
+            {nextId && (
+              <Link
+                href={`/exercises/${nextId}`}
+                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
+              >
+                Suivant →
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── NON-LABYRINTH: ONE QUESTION AT A TIME ───
+
+  // Compute score for correction mode
+  const computeScore = () => {
+    let correct = 0;
+    let incorrect = 0;
+    questions.forEach((q) => {
+      if (exercise.type === "free_text") {
+        // free_text: don't count as correct/incorrect
+        return;
+      }
+      if (exercise.type === "multi_select") {
+        const correctIds = (exercise.answers as { correctIds: number[] }).correctIds;
+        const isSelected = userAnswers[q.id] === "true";
+        const shouldBeSelected = correctIds.includes(q.id);
+        if (isSelected === shouldBeSelected) correct++;
+        else incorrect++;
+      } else {
+        const userAnswer = userAnswers[q.id];
+        const correctAnswer = exercise.answers[q.id] as string;
+        if (userAnswer && userAnswer === correctAnswer) correct++;
+        else incorrect++;
+      }
+    });
+    return { correct, incorrect, total: correct + incorrect };
+  };
+
+  function handleRestart() {
+    setUserAnswers({});
+    setShowCorrection(false);
+    setCurrentIndex(0);
+    saveAnswers({}, false);
+  }
+
+  const status = currentQuestion ? getStatus(currentQuestion.id) : null;
+  const isFirstQuestion = currentIndex === 0;
+  const isLastQuestion = currentIndex === totalQuestions - 1;
+  const score = showCorrection ? computeScore() : null;
+
+  // ─── CORRECTION MODE: Show all questions with results ───
+  if (showCorrection) {
+    return (
+      <div className="exercise-container">
+        {/* Back link */}
+        <Link
+          href="/exercises"
+          className="inline-flex items-center gap-1.5 text-sm text-foreground/40 hover:text-primary transition-colors mb-6"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Retour aux exercices
+        </Link>
+
+        {/* Exercise header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            <span className="text-primary">Exercice {exercise.number}</span>
+            <span className="text-foreground/20 mx-2">—</span>
+            <span className="text-foreground/80">{exercise.title}</span>
+          </h1>
+        </div>
+
+        {/* Score card */}
+        {score && exercise.type !== "free_text" && (
+          <div className="exercise-card mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-foreground/40 font-medium mb-1">Résultat</p>
+                <p className="text-3xl font-bold tabular-nums">
+                  <span className="text-success">{score.correct}</span>
+                  <span className="text-foreground/15 mx-1">/</span>
+                  <span className="text-foreground/40">{score.total}</span>
+                </p>
+              </div>
+              <div className="text-right">
+                {score.incorrect === 0 ? (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 text-success text-sm font-medium">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Parfait !
+                  </div>
+                ) : (
+                  <p className="text-sm text-foreground/40">
+                    {score.incorrect} erreur{score.incorrect > 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
+            </div>
+            {/* Score bar */}
+            <div className="mt-4 h-1.5 bg-foreground/[0.06] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-success rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${(score.correct / score.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {exercise.type === "free_text" && (
+          <div className="exercise-card mb-6">
+            <p className="text-sm text-foreground/50">
+              Comparez vos réponses avec les réponses attendues ci-dessous.
+            </p>
+          </div>
+        )}
+
+        {/* All questions with corrections */}
+        <div className="space-y-3">
+          {questions.map((q, qIndex) => {
+            const qStatus = getStatus(q.id);
+            const userAnswer = userAnswers[q.id];
+
+            return (
+              <div
+                key={q.id}
+                className={`exercise-card exercise-slide-in ${qStatus === "correct"
+                  ? "ring-1 ring-success/25"
+                  : qStatus === "incorrect"
+                    ? "ring-1 ring-error/25"
+                    : ""
+                  }`}
+                style={{ animationDelay: `${qIndex * 40}ms` }}
+              >
+                {/* Question header */}
+                <div className="flex items-start gap-3 mb-3">
+                  <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold shrink-0 ${qStatus === "correct"
+                    ? "bg-success text-white"
+                    : qStatus === "incorrect"
+                      ? "bg-error text-white"
+                      : "bg-primary text-white"
+                    }`}>
+                    {qStatus === "correct" ? (
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : qStatus === "incorrect" ? (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 2L8 8M8 2L2 8" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    ) : (
+                      qIndex + 1
+                    )}
+                  </span>
+                  <p className="text-[15px] font-medium leading-relaxed text-foreground/85 pt-0.5">
+                    {q.text}
+                  </p>
+                </div>
+
+                {/* User's answer */}
+                {exercise.type !== "free_text" && (
+                  <div className="ml-9">
+                    <p className="text-sm text-foreground/50">
+                      Votre réponse :{" "}
+                      <span className={`font-medium ${qStatus === "correct" ? "text-success" : qStatus === "incorrect" ? "text-error" : "text-foreground/70"
+                        }`}>
+                        {userAnswer || "—"}
+                      </span>
+                    </p>
+
+                    {/* Show expected answer if incorrect */}
+                    {qStatus === "incorrect" && exercise.type !== "multi_select" && (
+                      <div className="exercise-correction mt-2">
+                        <span className="text-foreground/40 text-xs uppercase tracking-wide font-medium">Réponse attendue</span>
+                        <p className="text-sm font-medium text-foreground/70 mt-0.5">
+                          {exercise.answers[q.id] as string}
+                        </p>
+                      </div>
+                    )}
+
+                    {qStatus === "incorrect" && exercise.type === "multi_select" && (
+                      <div className="exercise-correction mt-2">
+                        <p className="text-sm text-foreground/70">
+                          {(exercise.answers as { correctIds: number[] }).correctIds.includes(q.id)
+                            ? "Cette proposition est une bonne posture."
+                            : "Cette proposition n'est pas une bonne posture."}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Free text: show user answer + expected */}
+                {exercise.type === "free_text" && (
+                  <div className="ml-9 space-y-2">
+                    <div className="px-3 py-2 rounded-lg bg-foreground/[0.03] border border-foreground/[0.06]">
+                      <p className="text-xs text-foreground/35 font-medium uppercase tracking-wide mb-1">Votre réponse</p>
+                      <p className="text-sm text-foreground/70">{userAnswer || "—"}</p>
+                    </div>
+                    <div className="exercise-correction">
+                      <span className="text-foreground/40 text-xs uppercase tracking-wide font-medium">Réponse attendue</span>
+                      <p className="text-sm text-foreground/70 mt-0.5">
+                        {exercise.answers[q.id] as string}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Save error */}
+        {saveError && (
+          <div className="mt-3 text-xs text-error text-center">{saveError}</div>
+        )}
+
+        {/* Action buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+          <button
+            onClick={handleRestart}
+            className="exercise-nav-btn w-full sm:w-auto justify-center"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8C2 4.686 4.686 2 8 2C11.314 2 14 4.686 14 8C14 11.314 11.314 14 8 14C5.5 14 3.4 12.5 2.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M2 4V8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Recommencer
+          </button>
+
           {nextId && (
             <Link
               href={`/exercises/${nextId}`}
-              className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
+              className="exercise-nav-btn exercise-nav-btn-primary w-full sm:w-auto justify-center"
             >
-              Suivant →
+              Exercice suivant
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </Link>
           )}
         </div>
 
-        {!isLabyrinth && (
+        {/* Exercise navigation */}
+        <div className="mt-10 pt-6 border-t border-foreground/[0.06] flex justify-between items-center">
+          {prevId ? (
+            <Link
+              href={`/exercises/${prevId}`}
+              className="text-sm text-foreground/35 hover:text-primary transition-colors"
+            >
+              ← Exercice précédent
+            </Link>
+          ) : <span />}
+          {nextId ? (
+            <Link
+              href={`/exercises/${nextId}`}
+              className="text-sm text-foreground/35 hover:text-primary transition-colors"
+            >
+              Exercice suivant →
+            </Link>
+          ) : <span />}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── NORMAL QUIZ MODE: One question at a time ───
+  return (
+    <div className="exercise-container">
+      {/* Back link */}
+      <Link
+        href="/exercises"
+        className="inline-flex items-center gap-1.5 text-sm text-foreground/40 hover:text-primary transition-colors mb-6"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+          <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Retour aux exercices
+      </Link>
+
+      {/* Exercise header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          <span className="text-primary">Exercice {exercise.number}</span>
+          <span className="text-foreground/20 mx-2">—</span>
+          <span className="text-foreground/80">{exercise.title}</span>
+        </h1>
+
+        {exercise.content.instruction && (
+          <p className="text-foreground/50 mt-2 text-[15px] leading-relaxed">
+            {exercise.content.instruction}
+          </p>
+        )}
+
+        {exercise.content.legend && (
+          <div className="mt-3 px-3 py-2 bg-foreground/[0.03] rounded-lg border border-foreground/[0.06]">
+            <p className="text-xs text-foreground/40 leading-relaxed">
+              {exercise.content.legend}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Progress bar */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex-1 h-1 bg-foreground/[0.06] rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary/80 rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: totalQuestions > 0
+                ? `${(answeredCount / totalQuestions) * 100}%`
+                : "0%",
+            }}
+          />
+        </div>
+        <span className="text-xs text-foreground/30 tabular-nums shrink-0">
+          {answeredCount}/{totalQuestions}
+        </span>
+        {saving && (
+          <span className="text-xs text-foreground/25 animate-pulse">●</span>
+        )}
+      </div>
+
+      {/* Question card */}
+      {currentQuestion && (
+        <div
+          className={`exercise-card ${slideDirection === "left"
+            ? "exercise-slide-out-left"
+            : slideDirection === "right"
+              ? "exercise-slide-out-right"
+              : "exercise-slide-in"
+            }`}
+        >
+          {/* Question number badge */}
+          <div className="flex items-center gap-2.5 mb-5">
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold">
+              {currentIndex + 1}
+            </span>
+            <span className="text-xs text-foreground/35 font-medium">
+              Question {currentIndex + 1} sur {totalQuestions}
+            </span>
+          </div>
+
+          {/* Question text */}
+          <p className="text-[16px] font-medium leading-relaxed text-foreground/90 mb-6">
+            {currentQuestion.text}
+          </p>
+
+          {/* ─── SINGLE CHOICE: Pills ─── */}
+          {exercise.type === "single_choice" && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {options.map((opt) => {
+                const isSelected = userAnswers[currentQuestion.id] === opt;
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => handleAnswer(currentQuestion.id, opt)}
+                    className={`exercise-pill ${isSelected ? "exercise-pill-active" : ""}`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ─── QCM: Option cards ─── */}
+          {exercise.type === "qcm" && currentQuestion.options && (
+            <div className="space-y-2">
+              {currentQuestion.options.map((opt) => {
+                const isSelected = userAnswers[currentQuestion.id] === opt.label;
+                return (
+                  <button
+                    key={opt.label}
+                    onClick={() => handleAnswer(currentQuestion.id, opt.label)}
+                    className={`exercise-option-card ${isSelected ? "exercise-option-card-active" : ""}`}
+                  >
+                    <span className="exercise-option-label">{opt.label}</span>
+                    <span className="text-[14px] leading-snug">{opt.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ─── MULTI SELECT: Checkbox cards ─── */}
+          {exercise.type === "multi_select" && (
+            <button
+              onClick={() => handleMultiSelectToggle(currentQuestion.id)}
+              className={`exercise-option-card ${userAnswers[currentQuestion.id] === "true" ? "exercise-option-card-active" : ""
+                }`}
+            >
+              <span className={`exercise-checkbox ${userAnswers[currentQuestion.id] === "true" ? "exercise-checkbox-active" : ""
+                }`}>
+                {userAnswers[currentQuestion.id] === "true" && (
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span className="text-[14px] leading-snug">Bonne posture pour le MP</span>
+            </button>
+          )}
+
+          {/* ─── TRUE / FALSE: Two large cards ─── */}
+          {exercise.type === "true_false" && (
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => handleAnswer(currentQuestion.id, "Vrai")}
+                className={`exercise-tf-card ${userAnswers[currentQuestion.id] === "Vrai" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="mb-1">
+                  <path d="M4 10L8.5 14.5L16 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Vrai
+              </button>
+              <button
+                onClick={() => handleAnswer(currentQuestion.id, "Faux")}
+                className={`exercise-tf-card ${userAnswers[currentQuestion.id] === "Faux" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="mb-1">
+                  <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Faux
+              </button>
+            </div>
+          )}
+
+          {/* ─── FREE TEXT: Textarea ─── */}
+          {exercise.type === "free_text" && (
+            <div>
+              {exercise.content.columns && (
+                <p className="text-xs text-foreground/35 mb-2 font-medium uppercase tracking-wide">
+                  {exercise.content.columns.right}
+                </p>
+              )}
+              <textarea
+                value={userAnswers[currentQuestion.id] || ""}
+                onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
+                onBlur={() => saveAnswers(userAnswers)}
+                rows={3}
+                placeholder="Votre réponse..."
+                className="exercise-textarea"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Save error */}
+      {saveError && (
+        <div className="mt-3 text-xs text-error text-center">{saveError}</div>
+      )}
+
+      {/* Navigation footer */}
+      <div className="mt-6 flex items-center justify-between">
+        {/* Previous button */}
+        <button
+          onClick={() => navigateTo(currentIndex - 1, "right")}
+          disabled={isFirstQuestion}
+          className="exercise-nav-btn"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="hidden sm:inline">Précédent</span>
+        </button>
+
+        {/* Dots */}
+        <div className="flex items-center gap-1 flex-wrap justify-center max-w-[60%]">
+          {questions.map((q, i) => {
+            const isAnswered = !!userAnswers[q.id]?.trim();
+            const isCurrent = i === currentIndex;
+            return (
+              <button
+                key={q.id}
+                onClick={() => navigateTo(i, i > currentIndex ? "left" : "right")}
+                className={`exercise-dot ${isCurrent
+                  ? "exercise-dot-current"
+                  : isAnswered
+                    ? "exercise-dot-answered"
+                    : "exercise-dot-empty"
+                  }`}
+                aria-label={`Question ${i + 1}`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Next / Vérifier button */}
+        {isLastQuestion ? (
           <button
             onClick={handleCheck}
-            className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors"
+            className="exercise-nav-btn exercise-nav-btn-primary"
           >
-            Vérifier mes réponses
+            <span>Vérifier</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8L6.5 11.5L13 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={() => navigateTo(currentIndex + 1, "left")}
+            disabled={isLastQuestion}
+            className="exercise-nav-btn"
+          >
+            <span className="hidden sm:inline">Suivant</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
         )}
+      </div>
+
+      {/* Exercise navigation (prev/next exercise) */}
+      <div className="mt-10 pt-6 border-t border-foreground/[0.06] flex justify-between items-center">
+        {prevId ? (
+          <Link
+            href={`/exercises/${prevId}`}
+            className="text-sm text-foreground/35 hover:text-primary transition-colors"
+          >
+            ← Exercice précédent
+          </Link>
+        ) : <span />}
+        {nextId ? (
+          <Link
+            href={`/exercises/${nextId}`}
+            className="text-sm text-foreground/35 hover:text-primary transition-colors"
+          >
+            Exercice suivant →
+          </Link>
+        ) : <span />}
       </div>
     </div>
   );

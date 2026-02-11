@@ -54,6 +54,7 @@ export default async function ExercisePage({
           savedAnswers={
             (progress?.userAnswers as Record<string, string>) || {}
           }
+          isCompleted={progress?.completed ?? false}
           prevId={prevExercise?.id || null}
           nextId={nextExercise?.id || null}
         />

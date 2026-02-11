@@ -45,3 +45,350 @@ textarea:focus {
 a {
   color: inherit;
 }
+
+/* ═══════════════════════════════════════
+   EXERCISE COMPONENTS
+   ═══════════════════════════════════════ */
+
+.exercise-container {
+  max-width: 100%;
+}
+
+/* Card */
+.exercise-card {
+  background: white;
+  border-radius: 12px;
+  padding: 28px 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Slide animations */
+.exercise-slide-in {
+  animation: exerciseFadeIn 0.22s ease-out both;
+}
+
+.exercise-slide-out-left {
+  animation: exerciseFadeOutLeft 0.18s ease-in both;
+}
+
+.exercise-slide-out-right {
+  animation: exerciseFadeOutRight 0.18s ease-in both;
+}
+
+@keyframes exerciseFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes exerciseFadeOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+
+@keyframes exerciseFadeOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .exercise-slide-in,
+  .exercise-slide-out-left,
+  .exercise-slide-out-right {
+    animation: none;
+  }
+}
+
+/* Pills (single_choice) */
+.exercise-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(31, 41, 55, 0.1);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(31, 41, 55, 0.7);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.exercise-pill:hover {
+  border-color: rgba(147, 1, 55, 0.3);
+  background: rgba(147, 1, 55, 0.03);
+  color: #930137;
+}
+
+.exercise-pill-active {
+  border-color: #930137;
+  background: #930137;
+  color: white;
+}
+
+.exercise-pill-active:hover {
+  border-color: #B01A4F;
+  background: #B01A4F;
+  color: white;
+}
+
+/* Option cards (qcm, multi_select) */
+.exercise-option-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(31, 41, 55, 0.08);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: rgba(31, 41, 55, 0.75);
+}
+
+.exercise-option-card:hover {
+  border-color: rgba(147, 1, 55, 0.2);
+  background: rgba(147, 1, 55, 0.02);
+}
+
+.exercise-option-card-active {
+  border-color: #930137;
+  background: rgba(147, 1, 55, 0.05);
+  color: #1F2937;
+}
+
+.exercise-option-card-active:hover {
+  border-color: #930137;
+  background: rgba(147, 1, 55, 0.07);
+}
+
+.exercise-option-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(31, 41, 55, 0.06);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(31, 41, 55, 0.5);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.exercise-option-card-active .exercise-option-label {
+  background: #930137;
+  color: white;
+}
+
+/* Checkbox */
+.exercise-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(31, 41, 55, 0.2);
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  margin-top: 1px;
+}
+
+.exercise-checkbox-active {
+  background: #930137;
+  border-color: #930137;
+}
+
+/* True/False cards */
+.exercise-tf-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 20px 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(31, 41, 55, 0.08);
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(31, 41, 55, 0.55);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.exercise-tf-card:hover {
+  border-color: rgba(147, 1, 55, 0.25);
+  background: rgba(147, 1, 55, 0.02);
+  color: rgba(31, 41, 55, 0.75);
+}
+
+.exercise-tf-card-active {
+  border-color: #930137;
+  background: #930137;
+  color: white;
+}
+
+.exercise-tf-card-active:hover {
+  border-color: #B01A4F;
+  background: #B01A4F;
+  color: white;
+}
+
+/* Textarea */
+.exercise-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid rgba(31, 41, 55, 0.1);
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1F2937;
+  background: transparent;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exercise-textarea::placeholder {
+  color: rgba(31, 41, 55, 0.25);
+}
+
+.exercise-textarea:focus {
+  outline: none;
+  border-color: rgba(147, 1, 55, 0.4);
+  box-shadow: 0 0 0 3px rgba(147, 1, 55, 0.06);
+}
+
+/* Correction box */
+.exercise-correction {
+  padding: 12px 14px;
+  background: rgba(147, 1, 55, 0.04);
+  border-radius: 8px;
+  border-left: 3px solid rgba(147, 1, 55, 0.3);
+}
+
+/* Dot pagination */
+.exercise-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.exercise-dot-current {
+  background: #930137;
+  transform: scale(1.25);
+}
+
+.exercise-dot-answered {
+  background: rgba(147, 1, 55, 0.35);
+}
+
+.exercise-dot-answered:hover {
+  background: rgba(147, 1, 55, 0.55);
+}
+
+.exercise-dot-empty {
+  background: rgba(31, 41, 55, 0.1);
+}
+
+.exercise-dot-empty:hover {
+  background: rgba(31, 41, 55, 0.2);
+}
+
+/* Navigation buttons */
+.exercise-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 41, 55, 0.1);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(31, 41, 55, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.exercise-nav-btn:hover:not(:disabled) {
+  border-color: rgba(31, 41, 55, 0.2);
+  color: rgba(31, 41, 55, 0.7);
+  background: white;
+}
+
+.exercise-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.exercise-nav-btn-primary {
+  border-color: #930137;
+  background: #930137;
+  color: white;
+}
+
+.exercise-nav-btn-primary:hover:not(:disabled) {
+  background: #B01A4F;
+  border-color: #B01A4F;
+  color: white;
+}
+
+/* ═══════════════════════════════════════
+   EXERCISE LIST GRID
+   ═══════════════════════════════════════ */
+
+@keyframes gridCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid-card-enter {
+  animation: gridCardIn 0.4s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-card-enter {
+    animation: none;
+  }
+}
