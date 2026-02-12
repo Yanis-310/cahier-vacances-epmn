@@ -10,7 +10,13 @@ const profileSchema = z.object({
   currentPassword: z.string().min(1, "Le mot de passe actuel est requis."),
   newPassword: z
     .string()
-    .min(6, "Le nouveau mot de passe doit faire au moins 6 caractères.")
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.")
+    .refine((val) => /[A-Z]/.test(val), {
+      message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.",
+    })
+    .refine((val) => /[^A-Za-z0-9]/.test(val), {
+      message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.",
+    })
     .optional()
     .or(z.literal("")),
 });

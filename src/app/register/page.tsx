@@ -7,6 +7,12 @@ import { useState } from "react";
 export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
+
+  const hasMinLength = password.length >= 8;
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+  const isPasswordValid = hasMinLength && hasUppercase && hasSpecial;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,6 +24,12 @@ export default function RegisterPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (!isPasswordValid) {
+      setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
@@ -103,12 +115,29 @@ export default function RegisterPage() {
               name="password"
               type="password"
               required
-              minLength={6}
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             />
-            <p className="text-xs text-foreground/40 mt-1">
-              Minimum 6 caractères
-            </p>
+            {password.length > 0 && (
+              <ul className="text-xs mt-1.5 space-y-0.5">
+                <li className={hasMinLength ? "text-success" : "text-foreground/40"}>
+                  {hasMinLength ? "\u2713" : "\u2717"} 8 caractères minimum
+                </li>
+                <li className={hasUppercase ? "text-success" : "text-foreground/40"}>
+                  {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
+                </li>
+                <li className={hasSpecial ? "text-success" : "text-foreground/40"}>
+                  {hasSpecial ? "\u2713" : "\u2717"} Un caractère spécial
+                </li>
+              </ul>
+            )}
+            {password.length === 0 && (
+              <p className="text-xs text-foreground/40 mt-1">
+                Minimum 8 caractères, une majuscule et un caractère spécial
+              </p>
+            )}
           </div>
 
           <div>
@@ -123,7 +152,7 @@ export default function RegisterPage() {
               name="confirmPassword"
               type="password"
               required
-              minLength={6}
+              minLength={8}
               className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
             />
           </div>

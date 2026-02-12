@@ -6,7 +6,15 @@ import { z } from "zod";
 const registerSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(6),
+  password: z
+    .string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.")
+    .refine((val) => /[A-Z]/.test(val), {
+      message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.",
+    })
+    .refine((val) => /[^A-Za-z0-9]/.test(val), {
+      message: "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.",
+    }),
 });
 
 export async function POST(request: Request) {
