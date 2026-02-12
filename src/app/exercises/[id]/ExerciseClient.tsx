@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface QcmOption {
   label: string;
@@ -53,7 +54,22 @@ export default function ExerciseClient({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [pageTransition, setPageTransition] = useState<"enter" | "exit" | null>("enter");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
+
+  // Fade-in on mount
+  useEffect(() => {
+    const t = setTimeout(() => setPageTransition(null), 350);
+    return () => clearTimeout(t);
+  }, []);
+
+  function navigateToExercise(href: string) {
+    setPageTransition("exit");
+    setTimeout(() => {
+      router.push(href);
+    }, 250);
+  }
 
   const questions = exercise.content.questions || [];
   const options = exercise.content.options || [];
@@ -203,7 +219,7 @@ export default function ExerciseClient({
   // ─── LABYRINTH RENDERING (preserved as-is) ───
   if (isLabyrinth) {
     return (
-      <div>
+      <div className={`exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
         <div className="mb-8">
           <Link
             href="/exercises"
@@ -350,20 +366,20 @@ export default function ExerciseClient({
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex gap-3">
             {prevId && (
-              <Link
-                href={`/exercises/${prevId}`}
-                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
+              <button
+                onClick={() => navigateToExercise(`/exercises/${prevId}`)}
+                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors cursor-pointer"
               >
                 ← Précédent
-              </Link>
+              </button>
             )}
             {nextId && (
-              <Link
-                href={`/exercises/${nextId}`}
-                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors"
+              <button
+                onClick={() => navigateToExercise(`/exercises/${nextId}`)}
+                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors cursor-pointer"
               >
                 Suivant →
-              </Link>
+              </button>
             )}
           </div>
         </div>
@@ -413,7 +429,7 @@ export default function ExerciseClient({
   // ─── CORRECTION MODE: Show all questions with results ───
   if (showCorrection) {
     return (
-      <div className="exercise-container">
+      <div className={`exercise-container exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
         {/* Back link */}
         <Link
           href="/exercises"
@@ -593,35 +609,41 @@ export default function ExerciseClient({
           </button>
 
           {nextId && (
-            <Link
-              href={`/exercises/${nextId}`}
-              className="exercise-nav-btn exercise-nav-btn-primary w-full sm:w-auto justify-center"
+            <button
+              onClick={() => navigateToExercise(`/exercises/${nextId}`)}
+              className="exercise-nav-btn exercise-nav-btn-primary w-full sm:w-auto justify-center cursor-pointer"
             >
               Exercice suivant
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </Link>
+            </button>
           )}
         </div>
 
         {/* Exercise navigation */}
         <div className="mt-10 pt-6 border-t border-foreground/[0.06] flex justify-between items-center">
           {prevId ? (
-            <Link
-              href={`/exercises/${prevId}`}
-              className="text-sm text-foreground/35 hover:text-primary transition-colors"
+            <button
+              onClick={() => navigateToExercise(`/exercises/${prevId}`)}
+              className="exercise-exnav-btn cursor-pointer"
             >
-              ← Exercice précédent
-            </Link>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Exercice précédent
+            </button>
           ) : <span />}
           {nextId ? (
-            <Link
-              href={`/exercises/${nextId}`}
-              className="text-sm text-foreground/35 hover:text-primary transition-colors"
+            <button
+              onClick={() => navigateToExercise(`/exercises/${nextId}`)}
+              className="exercise-exnav-btn cursor-pointer"
             >
-              Exercice suivant →
-            </Link>
+              Exercice suivant
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+                <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
           ) : <span />}
         </div>
       </div>
@@ -630,7 +652,7 @@ export default function ExerciseClient({
 
   // ─── NORMAL QUIZ MODE: One question at a time ───
   return (
-    <div className="exercise-container">
+    <div className={`exercise-container exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
       {/* Back link */}
       <Link
         href="/exercises"
@@ -712,7 +734,7 @@ export default function ExerciseClient({
 
           {/* ─── SINGLE CHOICE: Pills ─── */}
           {exercise.type === "single_choice" && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 gap-2">
               {options.map((opt) => {
                 const isSelected = userAnswers[currentQuestion.id] === opt;
                 return (
@@ -804,7 +826,7 @@ export default function ExerciseClient({
                 value={userAnswers[currentQuestion.id] || ""}
                 onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                 onBlur={() => saveAnswers(userAnswers)}
-                rows={3}
+                rows={4}
                 placeholder="Votre réponse..."
                 className="exercise-textarea"
               />
@@ -833,7 +855,7 @@ export default function ExerciseClient({
         </button>
 
         {/* Dots */}
-        <div className="flex items-center gap-1 flex-wrap justify-center max-w-[60%]">
+        <div className="exercise-dots-container">
           {questions.map((q, i) => {
             const isAnswered = !!userAnswers[q.id]?.trim();
             const isCurrent = i === currentIndex;
@@ -881,20 +903,26 @@ export default function ExerciseClient({
       {/* Exercise navigation (prev/next exercise) */}
       <div className="mt-10 pt-6 border-t border-foreground/[0.06] flex justify-between items-center">
         {prevId ? (
-          <Link
-            href={`/exercises/${prevId}`}
-            className="text-sm text-foreground/35 hover:text-primary transition-colors"
+          <button
+            onClick={() => navigateToExercise(`/exercises/${prevId}`)}
+            className="exercise-exnav-btn cursor-pointer"
           >
-            ← Exercice précédent
-          </Link>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+              <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Exercice précédent
+          </button>
         ) : <span />}
         {nextId ? (
-          <Link
-            href={`/exercises/${nextId}`}
-            className="text-sm text-foreground/35 hover:text-primary transition-colors"
+          <button
+            onClick={() => navigateToExercise(`/exercises/${nextId}`)}
+            className="exercise-exnav-btn cursor-pointer"
           >
-            Exercice suivant →
-          </Link>
+            Exercice suivant
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
+              <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         ) : <span />}
       </div>
     </div>

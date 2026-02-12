@@ -46,8 +46,8 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
       <Navbar />
       <main>
         {/* Hero — mirrors Landing structure */}
-        <section className="bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center">
+        <section className="hero-landing">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pt-32 sm:pb-40 text-center">
             <p className="text-foreground/40 text-sm font-medium tracking-widest uppercase mb-4">
               {greeting}
             </p>
@@ -158,8 +158,9 @@ function Landing() {
       <Navbar />
       <main>
         {/* Hero */}
-        <section className="bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 text-center">
+        <section className="hero-landing">
+          {/* Hero content */}
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 sm:pt-32 sm:pb-52 text-center relative z-10">
             <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
               Cahier de Vacances des{" "}
               <span className="text-primary">Médiateurs Professionnels</span>

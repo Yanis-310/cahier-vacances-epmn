@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import "./globals.css";
@@ -12,6 +12,20 @@ export const metadata: Metadata = {
   title: "Cahier de Vacances — EPMN",
   description:
     "Cahier de Vacances des Médiateurs Professionnels — École Professionnelle de la Médiation et de la Négociation",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "EPMN Cahier",
+  },
+  icons: [
+    { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+  ],
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0569C8",
 };
 
 export default function RootLayout({
@@ -23,6 +37,17 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.variable} antialiased`}>
         <Providers>{children}</Providers>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );

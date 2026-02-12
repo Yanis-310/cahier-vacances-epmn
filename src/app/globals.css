@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #930137;
-  --color-primary-light: #B01A4F;
-  --color-primary-pale: #F9E8EE;
+  --color-primary: #0569C8;
+  --color-primary-light: #2580DB;
+  --color-primary-pale: #E8F1FA;
   --color-background: #F3F4F6;
   --color-foreground: #1F2937;
   --color-success: #16A34A;
@@ -16,7 +16,7 @@ body {
   background: #F3F4F6;
   color: #1F2937;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  accent-color: #930137;
+  accent-color: #0569C8;
 }
 
 /* Override browser default blue on all form elements */
@@ -24,21 +24,21 @@ input,
 select,
 textarea,
 button {
-  accent-color: #930137;
+  accent-color: #0569C8;
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  outline-color: #930137;
+  outline-color: #0569C8;
 }
 
 *:focus {
-  outline-color: #930137;
+  outline-color: #0569C8;
 }
 
 ::selection {
-  background-color: #930137;
+  background-color: #0569C8;
   color: white;
 }
 
@@ -112,12 +112,56 @@ a {
   }
 }
 
+/* Page transitions between exercises */
+.exercise-page-transition {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.exercise-page-enter {
+  animation: exercisePageEnter 0.35s ease-out both;
+}
+
+.exercise-page-exit {
+  animation: exercisePageExit 0.25s ease-in both;
+  pointer-events: none;
+}
+
+@keyframes exercisePageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes exercisePageExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.995);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
 
   .exercise-slide-in,
   .exercise-slide-out-left,
-  .exercise-slide-out-right {
+  .exercise-slide-out-right,
+  .exercise-page-enter,
+  .exercise-page-exit {
     animation: none;
+  }
+
+  .exercise-page-transition {
+    transition: none;
   }
 }
 
@@ -140,20 +184,20 @@ a {
 }
 
 .exercise-pill:hover {
-  border-color: rgba(147, 1, 55, 0.3);
-  background: rgba(147, 1, 55, 0.03);
-  color: #930137;
+  border-color: rgba(5, 105, 200, 0.3);
+  background: rgba(5, 105, 200, 0.03);
+  color: #0569C8;
 }
 
 .exercise-pill-active {
-  border-color: #930137;
-  background: #930137;
+  border-color: #0569C8;
+  background: #0569C8;
   color: white;
 }
 
 .exercise-pill-active:hover {
-  border-color: #B01A4F;
-  background: #B01A4F;
+  border-color: #2580DB;
+  background: #2580DB;
   color: white;
 }
 
@@ -174,19 +218,19 @@ a {
 }
 
 .exercise-option-card:hover {
-  border-color: rgba(147, 1, 55, 0.2);
-  background: rgba(147, 1, 55, 0.02);
+  border-color: rgba(5, 105, 200, 0.2);
+  background: rgba(5, 105, 200, 0.02);
 }
 
 .exercise-option-card-active {
-  border-color: #930137;
-  background: rgba(147, 1, 55, 0.05);
+  border-color: #0569C8;
+  background: rgba(5, 105, 200, 0.05);
   color: #1F2937;
 }
 
 .exercise-option-card-active:hover {
-  border-color: #930137;
-  background: rgba(147, 1, 55, 0.07);
+  border-color: #0569C8;
+  background: rgba(5, 105, 200, 0.07);
 }
 
 .exercise-option-label {
@@ -205,7 +249,7 @@ a {
 }
 
 .exercise-option-card-active .exercise-option-label {
-  background: #930137;
+  background: #0569C8;
   color: white;
 }
 
@@ -224,8 +268,8 @@ a {
 }
 
 .exercise-checkbox-active {
-  background: #930137;
-  border-color: #930137;
+  background: #0569C8;
+  border-color: #0569C8;
 }
 
 /* True/False cards */
@@ -247,20 +291,20 @@ a {
 }
 
 .exercise-tf-card:hover {
-  border-color: rgba(147, 1, 55, 0.25);
-  background: rgba(147, 1, 55, 0.02);
+  border-color: rgba(5, 105, 200, 0.25);
+  background: rgba(5, 105, 200, 0.02);
   color: rgba(31, 41, 55, 0.75);
 }
 
 .exercise-tf-card-active {
-  border-color: #930137;
-  background: #930137;
+  border-color: #0569C8;
+  background: #0569C8;
   color: white;
 }
 
 .exercise-tf-card-active:hover {
-  border-color: #B01A4F;
-  background: #B01A4F;
+  border-color: #2580DB;
+  background: #2580DB;
   color: white;
 }
 
@@ -284,16 +328,45 @@ a {
 
 .exercise-textarea:focus {
   outline: none;
-  border-color: rgba(147, 1, 55, 0.4);
-  box-shadow: 0 0 0 3px rgba(147, 1, 55, 0.06);
+  border-color: rgba(5, 105, 200, 0.4);
+  box-shadow: 0 0 0 3px rgba(5, 105, 200, 0.06);
 }
 
 /* Correction box */
 .exercise-correction {
   padding: 12px 14px;
-  background: rgba(147, 1, 55, 0.04);
+  background: rgba(5, 105, 200, 0.04);
   border-radius: 8px;
-  border-left: 3px solid rgba(147, 1, 55, 0.3);
+  border-left: 3px solid rgba(5, 105, 200, 0.3);
+}
+
+/* Dots container — scrollable on mobile, wraps on desktop */
+.exercise-dots-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  max-width: 60%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0;
+  mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8px, black calc(100% - 8px), transparent);
+}
+
+.exercise-dots-container::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .exercise-dots-container {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
 }
 
 /* Dot pagination */
@@ -309,16 +382,16 @@ a {
 }
 
 .exercise-dot-current {
-  background: #930137;
+  background: #0569C8;
   transform: scale(1.25);
 }
 
 .exercise-dot-answered {
-  background: rgba(147, 1, 55, 0.35);
+  background: rgba(5, 105, 200, 0.35);
 }
 
 .exercise-dot-answered:hover {
-  background: rgba(147, 1, 55, 0.55);
+  background: rgba(5, 105, 200, 0.55);
 }
 
 .exercise-dot-empty {
@@ -357,15 +430,40 @@ a {
 }
 
 .exercise-nav-btn-primary {
-  border-color: #930137;
-  background: #930137;
+  border-color: #0569C8;
+  background: #0569C8;
   color: white;
 }
 
 .exercise-nav-btn-primary:hover:not(:disabled) {
-  background: #B01A4F;
-  border-color: #B01A4F;
+  background: #2580DB;
+  border-color: #2580DB;
   color: white;
+}
+
+/* Exercise-level navigation (prev/next exercise) */
+.exercise-exnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(31, 41, 55, 0.4);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.exercise-exnav-btn:hover {
+  color: #0569C8;
+  background: rgba(5, 105, 200, 0.04);
+}
+
+.exercise-exnav-btn:active {
+  background: rgba(5, 105, 200, 0.08);
 }
 
 /* ═══════════════════════════════════════
@@ -377,6 +475,7 @@ a {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -391,4 +490,16 @@ a {
   .grid-card-enter {
     animation: none;
   }
+}
+
+/* ═══════════════════════════════════════
+   HERO SECTION — Landing
+   ═══════════════════════════════════════ */
+
+.hero-landing {
+  position: relative;
+  background-image: url('/hero-bg.png');
+  background-size: cover;
+  background-position: center 60%;
+  background-repeat: no-repeat;
 }
