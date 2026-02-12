@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+const STORAGE_KEY_PREFIX = "eval_answers_";
 
 interface EvalQuestion {
   index: number;
@@ -28,24 +30,74 @@ export default function EvaluationClient({
   total,
 }: Props) {
   const router = useRouter();
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const storageKey = STORAGE_KEY_PREFIX + evaluationId;
+
+  // Load saved answers from localStorage on mount
+  const [answers, setAnswers] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [restored, setRestored] = useState(false);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Persist answers to localStorage on every change (debounced)
+  const persistToStorage = useCallback(
+    (data: Record<string, string>) => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(() => {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(data));
+        } catch { /* storage full — ignore */ }
+      }, 300);
+    },
+    [storageKey]
+  );
+
+  // Detect if answers were restored from a previous session
+  useEffect(() => {
+    if (Object.keys(answers).length > 0) {
+      setRestored(true);
+      const t = setTimeout(() => setRestored(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
 
   const currentQuestion = questions[currentIndex];
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === total - 1;
 
   function handleAnswer(key: string, value: string) {
-    setAnswers((prev) => ({ ...prev, [key]: value }));
+    setAnswers((prev) => {
+      const updated = { ...prev, [key]: value };
+      persistToStorage(updated);
+      return updated;
+    });
   }
 
   function handleMultiSelectToggle(key: string) {
     const current = answers[key] === "true";
-    setAnswers((prev) => ({ ...prev, [key]: current ? "" : "true" }));
+    setAnswers((prev) => {
+      const updated = { ...prev, [key]: current ? "" : "true" };
+      persistToStorage(updated);
+      return updated;
+    });
   }
 
   const answeredCount = Object.keys(answers).filter(
@@ -97,6 +149,7 @@ export default function EvaluationClient({
         setSubmitting(false);
         return;
       }
+      try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
       router.push(`/evaluation/${evaluationId}/result`);
     } catch {
       setError("Erreur de connexion. Veuillez réessayer.");
@@ -125,6 +178,17 @@ export default function EvaluationClient({
           <span className="text-foreground/80">{total} questions</span>
         </h1>
       </div>
+
+      {/* Restored banner */}
+      {restored && (
+        <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-pale/60 text-primary text-xs font-medium transition-opacity">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
+            <path d="M1.5 7a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M7 4.5V7.5L9 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Vos réponses précédentes ont été restaurées.
+        </div>
+      )}
 
       {/* Progress bar */}
       <div className="flex items-center gap-3 mb-6">
