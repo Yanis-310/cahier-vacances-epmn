@@ -49,8 +49,6 @@ export default function Navbar() {
                   Évaluation
                 </Link>
 
-                <InstallButton />
-
                 {/* Separator */}
                 <div className="w-px h-5 bg-foreground/10 mx-3" />
 
@@ -71,7 +69,6 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <InstallButton />
                 <Link
                   href="/login"
                   className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
