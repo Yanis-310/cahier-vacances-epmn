@@ -42,8 +42,10 @@ textarea:focus {
   color: white;
 }
 
-a {
-  color: inherit;
+@layer base {
+  a {
+    color: inherit;
+  }
 }
 
 /* ═══════════════════════════════════════
