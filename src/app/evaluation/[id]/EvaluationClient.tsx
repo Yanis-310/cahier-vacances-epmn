@@ -77,6 +77,12 @@ export default function EvaluationClient({
   }
 
   async function handleSubmit() {
+    const unanswered = total - answeredCount;
+    if (unanswered > 0) {
+      if (!confirm(`Vous avez ${unanswered} question${unanswered > 1 ? "s" : ""} sans réponse. Soumettre quand même ?`)) return;
+    } else {
+      if (!confirm("Soumettre vos réponses ? Cette action est définitive.")) return;
+    }
     setSubmitting(true);
     setError(null);
     try {

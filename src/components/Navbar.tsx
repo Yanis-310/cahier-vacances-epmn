@@ -3,11 +3,17 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import InstallButton from "./InstallButton";
 
 export default function Navbar() {
   const { data: session } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  function isActive(href: string) {
+    return pathname === href || pathname.startsWith(href + "/");
+  }
 
   // Extract initials from user name
   const initials = session?.user?.name
@@ -38,13 +44,13 @@ export default function Navbar() {
                 {/* Navigation links */}
                 <Link
                   href="/exercises"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/exercises") ? "text-primary bg-primary-pale/50" : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"}`}
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground/70 hover:text-primary hover:bg-primary-pale/50 transition-colors"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/evaluation") ? "text-primary bg-primary-pale/50" : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"}`}
                 >
                   Évaluation
                 </Link>
@@ -141,19 +147,22 @@ export default function Navbar() {
                 {/* Nav links */}
                 <Link
                   href="/exercises"
-                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/exercises") ? "text-primary bg-primary-pale/50 font-medium" : "text-foreground/70 hover:bg-primary-pale hover:text-primary"}`}
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
-                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/evaluation") ? "text-primary bg-primary-pale/50 font-medium" : "text-foreground/70 hover:bg-primary-pale hover:text-primary"}`}
                 >
                   Évaluation
                 </Link>
                 <Link
                   href="/profile"
-                  className="block px-3 py-2.5 rounded-lg text-sm text-foreground/70 hover:bg-primary-pale hover:text-primary transition-colors"
+                  onClick={() => setMenuOpen(false)}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/profile") ? "text-primary bg-primary-pale/50 font-medium" : "text-foreground/70 hover:bg-primary-pale hover:text-primary"}`}
                 >
                   Mon profil
                 </Link>

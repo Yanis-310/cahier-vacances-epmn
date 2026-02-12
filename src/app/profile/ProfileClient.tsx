@@ -25,6 +25,11 @@ export default function ProfileClient({ user }: ProfileClientProps) {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const hasMinLength = newPassword.length >= 8;
+  const hasUppercase = /[A-Z]/.test(newPassword);
+  const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+  const isNewPasswordValid = hasMinLength && hasUppercase && hasSpecial;
+
   const memberSince = new Date(user.createdAt).toLocaleDateString("fr-FR", {
     day: "numeric",
     month: "long",
@@ -48,8 +53,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       return;
     }
 
-    if (newPassword && newPassword.length < 6) {
-      setError("Le nouveau mot de passe doit faire au moins 6 caractères.");
+    if (newPassword && !isNewPasswordValid) {
+      setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
       return;
     }
 
@@ -207,8 +212,22 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                minLength={8}
                 className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
               />
+              {newPassword.length > 0 && (
+                <ul className="text-xs mt-1.5 space-y-0.5">
+                  <li className={hasMinLength ? "text-success" : "text-foreground/40"}>
+                    {hasMinLength ? "\u2713" : "\u2717"} 8 caractères minimum
+                  </li>
+                  <li className={hasUppercase ? "text-success" : "text-foreground/40"}>
+                    {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
+                  </li>
+                  <li className={hasSpecial ? "text-success" : "text-foreground/40"}>
+                    {hasSpecial ? "\u2713" : "\u2717"} Un caractère spécial
+                  </li>
+                </ul>
+              )}
             </div>
 
             {newPassword && (

@@ -51,6 +51,8 @@ export default function ExerciseClient({
   const [showCorrection, setShowCorrection] = useState(isCompleted);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const saveSuccessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -99,6 +101,7 @@ export default function ExerciseClient({
     async (answers: Record<string, string>, completed = false) => {
       setSaving(true);
       setSaveError(null);
+      setSaveSuccess(false);
       try {
         const res = await fetch("/api/progress", {
           method: "POST",
@@ -111,6 +114,10 @@ export default function ExerciseClient({
         });
         if (!res.ok) {
           setSaveError("Échec de la sauvegarde.");
+        } else {
+          setSaveSuccess(true);
+          if (saveSuccessTimerRef.current) clearTimeout(saveSuccessTimerRef.current);
+          saveSuccessTimerRef.current = setTimeout(() => setSaveSuccess(false), 1500);
         }
       } catch {
         setSaveError("Échec de la sauvegarde.");
@@ -134,6 +141,7 @@ export default function ExerciseClient({
   useEffect(() => {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (saveSuccessTimerRef.current) clearTimeout(saveSuccessTimerRef.current);
     };
   }, []);
 
@@ -262,7 +270,15 @@ export default function ExerciseClient({
             {questions.filter((q) => isLabStepCorrect(q.id)).length}/{questions.length}
           </span>
           {saving && (
-            <span className="text-xs text-foreground/30">Sauvegarde...</span>
+            <span className="text-xs text-foreground/40 animate-pulse">Sauvegarde...</span>
+          )}
+          {!saving && saveSuccess && (
+            <span className="text-xs text-success flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Enregistré
+            </span>
           )}
         </div>
 
@@ -415,6 +431,7 @@ export default function ExerciseClient({
   };
 
   function handleRestart() {
+    if (!confirm("Recommencer cet exercice ? Toutes vos réponses seront effacées.")) return;
     setUserAnswers({});
     setShowCorrection(false);
     setCurrentIndex(0);
@@ -703,7 +720,15 @@ export default function ExerciseClient({
           {answeredCount}/{totalQuestions}
         </span>
         {saving && (
-          <span className="text-xs text-foreground/25 animate-pulse">●</span>
+          <span className="text-xs text-foreground/40 animate-pulse">Sauvegarde...</span>
+        )}
+        {!saving && saveSuccess && (
+          <span className="text-xs text-success flex items-center gap-1 transition-opacity">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Enregistré
+          </span>
         )}
       </div>
 
