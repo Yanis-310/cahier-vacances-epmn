@@ -15,6 +15,7 @@ model User {
   createdAt    DateTime       @default(now())
   progress     UserProgress[]
   evaluations  Evaluation[]
+  resetTokens  PasswordResetToken[]
 }
 
 enum ExerciseType {
@@ -62,4 +63,13 @@ model Evaluation {
   createdAt   DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
