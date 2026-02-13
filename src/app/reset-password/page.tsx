@@ -222,7 +222,8 @@ export default function ResetPasswordPage() {
         <Suspense
           fallback={
             <div className="text-center" role="status" aria-live="polite">
-              <span className="text-foreground/70">Chargement...</span>
+              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-primary/25 border-t-primary" />
+              <span className="text-foreground/70">Chargement en cours...</span>
             </div>
           }
         >

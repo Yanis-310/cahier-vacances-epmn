@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import FeedbackMessage from "@/components/FeedbackMessage";
 
 interface QcmOption {
   label: string;
@@ -157,6 +158,17 @@ export default function ExerciseClient({
     };
   }, []);
 
+  const navigateTo = useCallback((index: number, direction: "left" | "right") => {
+    if (isAnimating || index === currentIndex) return;
+    setSlideDirection(direction);
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setSlideDirection(null);
+      setIsAnimating(false);
+    }, 200);
+  }, [currentIndex, isAnimating]);
+
   // Keyboard navigation
   useEffect(() => {
     if (isLabyrinth) return;
@@ -171,18 +183,7 @@ export default function ExerciseClient({
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, totalQuestions, isLabyrinth]);
-
-  function navigateTo(index: number, direction: "left" | "right") {
-    if (isAnimating || index === currentIndex) return;
-    setSlideDirection(direction);
-    setIsAnimating(true);
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setSlideDirection(null);
-      setIsAnimating(false);
-    }, 200);
-  }
+  }, [currentIndex, isLabyrinth, navigateTo, totalQuestions]);
 
   const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -473,7 +474,6 @@ export default function ExerciseClient({
     await saveAnswers({}, false);
   }
 
-  const status = currentQuestion ? getStatus(currentQuestion.id) : null;
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const score = showCorrection ? computeScore() : null;
@@ -644,7 +644,7 @@ export default function ExerciseClient({
 
         {/* Save error */}
         {saveError && (
-          <div className="mt-3 text-xs text-error text-center">{saveError}</div>
+          <FeedbackMessage message={saveError} variant="error" className="mt-3" />
         )}
 
         {/* Action buttons */}
@@ -923,7 +923,7 @@ export default function ExerciseClient({
 
       {/* Save error */}
       {saveError && (
-        <div className="mt-3 text-xs text-error text-center">{saveError}</div>
+        <FeedbackMessage message={saveError} variant="error" className="mt-3" />
       )}
 
       {/* Navigation footer */}

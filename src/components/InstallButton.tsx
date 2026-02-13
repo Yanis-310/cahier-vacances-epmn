@@ -10,23 +10,22 @@ interface BeforeInstallPromptEvent extends Event {
 export default function InstallButton() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
+  const [isIOS] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const ua = window.navigator.userAgent;
+    return /iPad|iPhone|iPod/.test(ua) && !("MSStream" in window);
+  });
+  const [isStandalone] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      ("standalone" in window.navigator &&
+        (window.navigator as unknown as { standalone: boolean }).standalone)
+    );
+  });
   const [showIOSGuide, setShowIOSGuide] = useState(false);
 
   useEffect(() => {
-    // Detect if already installed (standalone mode)
-    const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      ("standalone" in window.navigator &&
-        (window.navigator as unknown as { standalone: boolean }).standalone);
-    setIsStandalone(!!standalone);
-
-    // Detect iOS
-    const ua = window.navigator.userAgent;
-    const ios = /iPad|iPhone|iPod/.test(ua) && !("MSStream" in window);
-    setIsIOS(ios);
-
     // Android / Chrome install prompt
     const handler = (e: Event) => {
       e.preventDefault();

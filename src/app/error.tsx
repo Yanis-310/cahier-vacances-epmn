@@ -19,7 +19,7 @@ export default function Error({
           Une erreur est survenue
         </h1>
         <p className="text-sm text-foreground/50 mb-6">
-          Quelque chose s&apos;est mal passe. Veuillez reessayer.
+          Quelque chose s&apos;est mal passé. Veuillez réessayer.
         </p>
         <button
           onClick={reset}

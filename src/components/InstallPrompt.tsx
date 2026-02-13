@@ -11,7 +11,11 @@ const DISMISS_KEY = "epmn_install_dismissed";
 
 export default function InstallPrompt() {
   const [show, setShow] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
+  const [isIOS] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const ua = navigator.userAgent;
+    return /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
+  });
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
@@ -22,12 +26,7 @@ export default function InstallPrompt() {
     // Don't show if user already dismissed
     if (localStorage.getItem(DISMISS_KEY)) return;
 
-    // Detect iOS Safari
-    const ua = navigator.userAgent;
-    const isiOS = /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
-
-    if (isiOS) {
-      setIsIOS(true);
+    if (isIOS) {
       // Small delay so it doesn't flash immediately on load
       const t = setTimeout(() => setShow(true), 2000);
       return () => clearTimeout(t);
@@ -42,7 +41,7 @@ export default function InstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
-  }, []);
+  }, [isIOS]);
 
   function dismiss() {
     setShow(false);

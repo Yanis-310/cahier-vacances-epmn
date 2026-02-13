@@ -9,6 +9,7 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test src/lib/*.test.ts",
     "seed": "npx tsx prisma/seed.ts"
   },
   "prisma": {

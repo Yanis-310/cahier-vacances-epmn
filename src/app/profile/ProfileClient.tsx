@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import FeedbackMessage from "@/components/FeedbackMessage";
 
 interface ProfileClientProps {
   user: {
@@ -156,14 +157,10 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       <section className="lg:col-span-2">
         <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="rounded-xl border border-error/25 bg-error/10 px-4 py-3 text-sm text-error">
-              {error}
-            </div>
+            <FeedbackMessage id="profile-feedback" message={error} variant="error" />
           )}
           {success && (
-            <div className="rounded-xl border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
-              {success}
-            </div>
+            <FeedbackMessage message={success} variant="success" />
           )}
 
           <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
