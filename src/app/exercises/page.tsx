@@ -86,8 +86,6 @@ export default async function ExercisesPage() {
       ? Math.round((completedCount / exercises.length) * 100)
       : 0;
 
-  const circumference = 2 * Math.PI * 28;
-
   return (
     <>
       <Navbar />
@@ -97,37 +95,10 @@ export default async function ExercisesPage() {
           <div className="bg-primary-pale/25 p-6 sm:p-8">
             <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-5">
-                <div className="relative h-16 w-16 flex-shrink-0">
-                  <svg className="h-16 w-16 -rotate-90" viewBox="0 0 64 64">
-                    <circle
-                      cx="32"
-                      cy="32"
-                      r="28"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      className="text-foreground/5"
-                    />
-                    <circle
-                      cx="32"
-                      cy="32"
-                      r="28"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      className="text-primary"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={circumference * (1 - progressPercent / 100)}
-                      style={{ transition: "stroke-dashoffset 0.5s ease" }}
-                    />
-                  </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">
-                    {progressPercent}%
-                  </span>
-                </div>
-
                 <div>
+                  <p className="inline-flex items-center rounded-full border border-primary/20 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                    Session de niveau
+                  </p>
                   <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Exercices</h1>
                   <p className="mt-0.5 text-sm text-foreground/55">
                     Revisez a votre rythme les fondamentaux de la mediation professionnelle.
