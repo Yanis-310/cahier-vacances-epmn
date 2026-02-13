@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
+import FeedbackMessage from "@/components/FeedbackMessage";
+import Toast from "@/components/Toast";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -12,6 +14,7 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const hasMinLength = password.length >= 8;
   const hasUppercase = /[A-Z]/.test(password);
@@ -20,10 +23,12 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="text-center">
-        <div className="bg-error/10 text-error text-sm p-4 rounded-lg mb-6">
-          Lien de réinitialisation invalide. Veuillez refaire une demande.
-        </div>
+      <div className="text-center space-y-4">
+        <FeedbackMessage
+          message="Lien de réinitialisation invalide. Veuillez refaire une demande."
+          variant="error"
+          className="mb-2"
+        />
         <Link href="/forgot-password" className="text-primary hover:underline text-sm">
           Demander un nouveau lien
         </Link>
@@ -39,14 +44,17 @@ function ResetPasswordForm() {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!isPasswordValid) {
-      setError(
-        "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial."
-      );
+      const message =
+        "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.";
+      setError(message);
+      setToastMessage(message);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      const message = "Les mots de passe ne correspondent pas.";
+      setError(message);
+      setToastMessage(message);
       return;
     }
 
@@ -62,14 +70,19 @@ function ResetPasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Une erreur est survenue.");
+        const message = data.error || "Une erreur est survenue.";
+        setError(message);
+        setToastMessage(message);
         setLoading(false);
         return;
       }
 
       setSuccess(true);
+      setToastMessage("Mot de passe réinitialisé avec succès.");
     } catch {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      const message = "Une erreur est survenue. Veuillez réessayer.";
+      setError(message);
+      setToastMessage(message);
     }
 
     setLoading(false);
@@ -77,13 +90,19 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="text-center">
-        <div className="bg-success/10 text-success text-sm p-4 rounded-lg mb-6">
-          Votre mot de passe a été réinitialisé avec succès.
-        </div>
+      <div className="text-center space-y-4">
+        <Toast
+          message={toastMessage}
+          variant="success"
+          onClose={() => setToastMessage(null)}
+        />
+        <FeedbackMessage
+          message="Votre mot de passe a été réinitialisé avec succès."
+          variant="success"
+        />
         <Link
           href="/login"
-          className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors"
+          className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2"
         >
           Se connecter
         </Link>
@@ -93,11 +112,19 @@ function ResetPasswordForm() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <Toast
+        message={toastMessage}
+        variant={error ? "error" : "success"}
+        onClose={() => setToastMessage(null)}
+      />
+
+      <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
         {error && (
-          <div className="bg-error/10 text-error text-sm p-3 rounded-lg">
-            {error}
-          </div>
+          <FeedbackMessage
+            id="reset-feedback"
+            message={error}
+            variant="error"
+          />
         )}
 
         <div>
@@ -115,24 +142,26 @@ function ResetPasswordForm() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={!!error}
+            aria-describedby={error ? "reset-feedback" : undefined}
             className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
           />
           {password.length > 0 && (
             <ul className="text-xs mt-1.5 space-y-0.5">
-              <li className={hasMinLength ? "text-success" : "text-foreground/40"}>
+              <li className={hasMinLength ? "text-success" : "text-foreground/60"}>
                 {hasMinLength ? "\u2713" : "\u2717"} 8 caractères minimum
               </li>
-              <li className={hasUppercase ? "text-success" : "text-foreground/40"}>
+              <li className={hasUppercase ? "text-success" : "text-foreground/60"}>
                 {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
               </li>
-              <li className={hasSpecial ? "text-success" : "text-foreground/40"}>
+              <li className={hasSpecial ? "text-success" : "text-foreground/60"}>
                 {hasSpecial ? "\u2713" : "\u2717"} Un caractère spécial
               </li>
             </ul>
           )}
           {password.length === 0 && (
-            <p className="text-xs text-foreground/40 mt-1">
-              Minimum 8 caractères, une majuscule et un caractère spécial
+            <p className="text-xs text-foreground/60 mt-1">
+                Minimum 8 caractères, une majuscule et un caractère spécial
             </p>
           )}
         </div>
@@ -150,6 +179,8 @@ function ResetPasswordForm() {
             type="password"
             required
             minLength={8}
+            aria-invalid={!!error}
+            aria-describedby={error ? "reset-feedback" : undefined}
             className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
           />
         </div>
@@ -157,13 +188,13 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50"
+          className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
         >
           {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-foreground/60 mt-6">
+      <p className="text-center text-sm text-foreground/70 mt-6">
         <Link href="/login" className="text-primary hover:underline">
           Retour à la connexion
         </Link>
@@ -183,14 +214,16 @@ export default function ResetPasswordPage() {
           <h1 className="text-xl font-semibold mt-4">
             Nouveau mot de passe
           </h1>
-          <p className="text-foreground/60 mt-1">
+          <p className="text-foreground/70 mt-1">
             Choisissez votre nouveau mot de passe
           </p>
         </div>
 
         <Suspense
           fallback={
-            <div className="text-center text-foreground/60">Chargement...</div>
+            <div className="text-center" role="status" aria-live="polite">
+              <span className="text-foreground/70">Chargement...</span>
+            </div>
           }
         >
           <ResetPasswordForm />

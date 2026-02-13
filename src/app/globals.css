@@ -191,6 +191,11 @@ textarea:focus {
   color: var(--color-primary);
 }
 
+.exercise-pill:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .exercise-pill-active {
   border-color: var(--color-primary);
   background: var(--color-primary);
@@ -222,6 +227,11 @@ textarea:focus {
 .exercise-option-card:hover {
   border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
   background: color-mix(in srgb, var(--color-primary) 2%, transparent);
+}
+
+.exercise-option-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .exercise-option-card-active {
@@ -296,6 +306,11 @@ textarea:focus {
   border-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
   background: color-mix(in srgb, var(--color-primary) 2%, transparent);
   color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
+}
+
+.exercise-tf-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .exercise-tf-card-active {
@@ -404,6 +419,11 @@ textarea:focus {
   background: color-mix(in srgb, var(--color-foreground) 20%, transparent);
 }
 
+.exercise-dot:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* Navigation buttons */
 .exercise-nav-btn {
   display: inline-flex;
@@ -424,6 +444,11 @@ textarea:focus {
   border-color: color-mix(in srgb, var(--color-foreground) 20%, transparent);
   color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
   background: white;
+}
+
+.exercise-nav-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .exercise-nav-btn:disabled {

@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import FeedbackMessage from "@/components/FeedbackMessage";
+import Toast from "@/components/Toast";
 
 const STORAGE_KEY_PREFIX = "eval_answers_";
 
@@ -44,10 +46,11 @@ export default function EvaluationClient({
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [restored, setRestored] = useState(false);
+  const [restored, setRestored] = useState(() => Object.keys(answers).length > 0);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Persist answers to localStorage on every change (debounced)
@@ -63,14 +66,12 @@ export default function EvaluationClient({
     [storageKey]
   );
 
-  // Detect if answers were restored from a previous session
+  // Hide restored banner after a short delay
   useEffect(() => {
-    if (Object.keys(answers).length > 0) {
-      setRestored(true);
-      const t = setTimeout(() => setRestored(false), 3000);
-      return () => clearTimeout(t);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!restored) return;
+    const t = setTimeout(() => setRestored(false), 3000);
+    return () => clearTimeout(t);
+  }, [restored]);
 
   const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -87,6 +88,17 @@ export default function EvaluationClient({
   const isLastQuestion = currentIndex === total - 1;
 
   const autoAdvanceTypes = ["single_choice", "qcm", "true_false"];
+
+  const navigateTo = useCallback((index: number, direction: "left" | "right") => {
+    if (isAnimating || index === currentIndex) return;
+    setSlideDirection(direction);
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrentIndex(index);
+      setSlideDirection(null);
+      setIsAnimating(false);
+    }, 200);
+  }, [currentIndex, isAnimating]);
 
   function handleAnswer(key: string, value: string) {
     setAnswers((prev) => {
@@ -130,18 +142,7 @@ export default function EvaluationClient({
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex, total]);
-
-  function navigateTo(index: number, direction: "left" | "right") {
-    if (isAnimating || index === currentIndex) return;
-    setSlideDirection(direction);
-    setIsAnimating(true);
-    setTimeout(() => {
-      setCurrentIndex(index);
-      setSlideDirection(null);
-      setIsAnimating(false);
-    }, 200);
-  }
+  }, [currentIndex, navigateTo, total]);
 
   async function handleSubmit() {
     const unanswered = total - answeredCount;
@@ -160,14 +161,18 @@ export default function EvaluationClient({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Erreur lors de la soumission. Veuillez réessayer.");
+        const message = data.error || "Erreur lors de la soumission. Veuillez réessayer.";
+        setError(message);
+        setToastMessage(message);
         setSubmitting(false);
         return;
       }
       try { localStorage.removeItem(storageKey); } catch { /* ignore */ }
       router.push(`/evaluation/${evaluationId}/result`);
     } catch {
-      setError("Erreur de connexion. Veuillez réessayer.");
+      const message = "Erreur de connexion. Veuillez réessayer.";
+      setError(message);
+      setToastMessage(message);
       setSubmitting(false);
     }
   }
@@ -196,7 +201,11 @@ export default function EvaluationClient({
 
       {/* Restored banner */}
       {restored && (
-        <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-pale/60 text-primary text-xs font-medium transition-opacity">
+        <div
+          className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-pale/60 text-primary text-xs font-medium transition-opacity"
+          role="status"
+          aria-live="polite"
+        >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0">
             <path d="M1.5 7a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z" stroke="currentColor" strokeWidth="1.2" />
             <path d="M7 4.5V7.5L9 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -215,7 +224,7 @@ export default function EvaluationClient({
             }}
           />
         </div>
-        <span className="text-xs text-foreground/30 tabular-nums shrink-0">
+        <span className="text-xs text-foreground/60 tabular-nums shrink-0">
           {answeredCount}/{total}
         </span>
       </div>
@@ -257,8 +266,10 @@ export default function EvaluationClient({
                 const isSelected = answers[currentQuestion.key] === opt;
                 return (
                   <button
+                    type="button"
                     key={opt}
                     onClick={() => handleAnswer(currentQuestion.key, opt)}
+                    aria-pressed={isSelected}
                     className={`exercise-pill ${isSelected ? "exercise-pill-active" : ""}`}
                   >
                     {opt}
@@ -275,8 +286,10 @@ export default function EvaluationClient({
                 const isSelected = answers[currentQuestion.key] === opt.label;
                 return (
                   <button
+                    type="button"
                     key={opt.label}
                     onClick={() => handleAnswer(currentQuestion.key, opt.label)}
+                    aria-pressed={isSelected}
                     className={`exercise-option-card ${isSelected ? "exercise-option-card-active" : ""}`}
                   >
                     <span className="exercise-option-label">{opt.label}</span>
@@ -290,7 +303,9 @@ export default function EvaluationClient({
           {/* ─── MULTI SELECT: Checkbox card ─── */}
           {currentQuestion.exerciseType === "multi_select" && (
             <button
+              type="button"
               onClick={() => handleMultiSelectToggle(currentQuestion.key)}
+              aria-pressed={answers[currentQuestion.key] === "true"}
               className={`exercise-option-card ${answers[currentQuestion.key] === "true" ? "exercise-option-card-active" : ""
                 }`}
             >
@@ -310,7 +325,9 @@ export default function EvaluationClient({
           {currentQuestion.exerciseType === "true_false" && (
             <div className="grid grid-cols-2 gap-3">
               <button
+                type="button"
                 onClick={() => handleAnswer(currentQuestion.key, "Vrai")}
+                aria-pressed={answers[currentQuestion.key] === "Vrai"}
                 className={`exercise-tf-card ${answers[currentQuestion.key] === "Vrai" ? "exercise-tf-card-active" : ""
                   }`}
               >
@@ -320,7 +337,9 @@ export default function EvaluationClient({
                 Vrai
               </button>
               <button
+                type="button"
                 onClick={() => handleAnswer(currentQuestion.key, "Faux")}
+                aria-pressed={answers[currentQuestion.key] === "Faux"}
                 className={`exercise-tf-card ${answers[currentQuestion.key] === "Faux" ? "exercise-tf-card-active" : ""
                   }`}
               >
@@ -334,15 +353,34 @@ export default function EvaluationClient({
         </div>
       )}
 
-      {/* Error */}
+      <Toast
+        message={toastMessage}
+        variant="error"
+        onClose={() => setToastMessage(null)}
+      />
+
+      {submitting && (
+        <FeedbackMessage
+          message="Soumission en cours, veuillez patienter..."
+          variant="info"
+          className="mt-3"
+        />
+      )}
+
       {error && (
-        <div className="mt-3 text-xs text-error text-center">{error}</div>
+        <FeedbackMessage
+          id="evaluation-feedback"
+          message={error}
+          variant="error"
+          className="mt-3"
+        />
       )}
 
       {/* Navigation footer */}
       <div className="mt-6 flex items-center justify-between">
         {/* Previous button */}
         <button
+          type="button"
           onClick={() => navigateTo(currentIndex - 1, "right")}
           disabled={isFirstQuestion}
           className="exercise-nav-btn"
@@ -361,6 +399,7 @@ export default function EvaluationClient({
             const isCurrent = i === currentIndex;
             return (
               <button
+                type="button"
                 key={q.key}
                 onClick={() => navigateTo(i, i > currentIndex ? "left" : "right")}
                 className={`exercise-dot ${isCurrent
@@ -370,6 +409,7 @@ export default function EvaluationClient({
                       : "exercise-dot-empty"
                   }`}
                 aria-label={`Question ${i + 1}`}
+                title={`Question ${i + 1}${isAnswered ? " - repondue" : " - non repondue"}`}
               />
             );
           })}
@@ -378,9 +418,11 @@ export default function EvaluationClient({
         {/* Next / Submit button */}
         {isLastQuestion ? (
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={submitting}
             className="exercise-nav-btn exercise-nav-btn-primary"
+            aria-describedby={error ? "evaluation-feedback" : undefined}
           >
             <span>{submitting ? "Envoi..." : "Soumettre"}</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -389,6 +431,7 @@ export default function EvaluationClient({
           </button>
         ) : (
           <button
+            type="button"
             onClick={() => navigateTo(currentIndex + 1, "left")}
             className="exercise-nav-btn"
             aria-label="Question suivante"

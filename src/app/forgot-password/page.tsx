@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import FeedbackMessage from "@/components/FeedbackMessage";
+import Toast from "@/components/Toast";
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -25,14 +28,19 @@ export default function ForgotPasswordPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || "Une erreur est survenue.");
+        const message = data.error || "Une erreur est survenue.";
+        setError(message);
+        setToastMessage(message);
         setLoading(false);
         return;
       }
 
       setSent(true);
+      setToastMessage("Si le compte existe, un email de réinitialisation a été envoyé.");
     } catch {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+      const message = "Une erreur est survenue. Veuillez réessayer.";
+      setError(message);
+      setToastMessage(message);
     }
 
     setLoading(false);
@@ -40,24 +48,29 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      <Toast
+        message={toastMessage}
+        variant={error ? "error" : "success"}
+        onClose={() => setToastMessage(null)}
+      />
+
       <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="text-2xl font-bold text-primary">
             EPMN
           </Link>
           <h1 className="text-xl font-semibold mt-4">Mot de passe oublié</h1>
-          <p className="text-foreground/60 mt-1">
+          <p className="text-foreground/70 mt-1">
             Entrez votre email pour recevoir un lien de réinitialisation
           </p>
         </div>
 
         {sent ? (
-          <div className="text-center">
-            <div className="bg-success/10 text-success text-sm p-4 rounded-lg mb-6">
-              Si un compte existe avec cette adresse email, un lien de
-              réinitialisation vous a été envoyé. Vérifiez votre boîte de
-              réception.
-            </div>
+          <div className="text-center space-y-4">
+            <FeedbackMessage
+              message="Si un compte existe avec cette adresse email, un lien de réinitialisation vous a été envoyé. Vérifiez votre boîte de réception."
+              variant="success"
+            />
             <Link
               href="/login"
               className="text-primary hover:underline text-sm"
@@ -67,11 +80,13 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
               {error && (
-                <div className="bg-error/10 text-error text-sm p-3 rounded-lg">
-                  {error}
-                </div>
+                <FeedbackMessage
+                  id="forgot-feedback"
+                  message={error}
+                  variant="error"
+                />
               )}
 
               <div>
@@ -86,6 +101,8 @@ export default function ForgotPasswordPage() {
                   name="email"
                   type="email"
                   required
+                  aria-invalid={!!error}
+                  aria-describedby={error ? "forgot-feedback" : undefined}
                   className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
                 />
               </div>
@@ -93,13 +110,13 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50"
+                className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
               >
                 {loading ? "Envoi..." : "Envoyer le lien"}
               </button>
             </form>
 
-            <p className="text-center text-sm text-foreground/60 mt-6">
+            <p className="text-center text-sm text-foreground/70 mt-6">
               <Link
                 href="/login"
                 className="text-primary hover:underline"
