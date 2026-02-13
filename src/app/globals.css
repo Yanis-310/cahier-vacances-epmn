@@ -525,3 +525,12 @@ textarea:focus {
   background-position: center 60%;
   background-repeat: no-repeat;
 }
+
+/* Mobile: image dédiée */
+@media (max-width: 640px) {
+  .hero-landing {
+    background-image: url('/Hero-mobile.png');
+    background-size: cover;
+    background-position: center center;
+  }
+}
