@@ -99,32 +99,13 @@ export default async function ExercisesPage() {
                   <p className="inline-flex items-center rounded-full border border-primary/20 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                     Session de niveau
                   </p>
-                  <h1 className="text-2xl font-bold text-foreground sm:text-3xl">Exercices</h1>
-                  <p className="mt-0.5 text-sm text-foreground/55">
+                  <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                    Exercices
+                  </h1>
+                  <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
                     Revisez a votre rythme les fondamentaux de la mediation professionnelle.
                   </p>
-                  <p className="mt-2 text-2xl font-bold text-foreground">
-                    {completedCount}{" "}
-                    <span className="text-base font-normal text-foreground/30">/ {exercises.length}</span>
-                  </p>
-                  <p className="mt-0.5 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2.5">
-                <div className="flex items-center gap-2 rounded-full bg-success/10 px-3 py-1.5 text-sm font-medium text-success">
-                  <span className="h-2 w-2 rounded-full bg-success" />
-                  {completedCount} termine{completedCount !== 1 ? "s" : ""}
-                </div>
-                {startedCount > 0 && (
-                  <div className="flex items-center gap-2 rounded-full bg-warning/10 px-3 py-1.5 text-sm font-medium text-warning">
-                    <span className="h-2 w-2 rounded-full bg-warning" />
-                    {startedCount} en cours
-                  </div>
-                )}
-                <div className="flex items-center gap-2 rounded-full bg-foreground/5 px-3 py-1.5 text-sm font-medium text-foreground/40">
-                  <span className="h-2 w-2 rounded-full bg-foreground/20" />
-                  {notStartedCount} restant{notStartedCount !== 1 ? "s" : ""}
+                  <p className="mt-2 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
                 </div>
               </div>
             </div>
