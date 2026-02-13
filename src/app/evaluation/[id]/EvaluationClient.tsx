@@ -72,10 +72,13 @@ export default function EvaluationClient({
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Cleanup timer on unmount
+  const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
     };
   }, []);
 
@@ -83,12 +86,22 @@ export default function EvaluationClient({
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === total - 1;
 
+  const autoAdvanceTypes = ["single_choice", "qcm", "true_false"];
+
   function handleAnswer(key: string, value: string) {
     setAnswers((prev) => {
       const updated = { ...prev, [key]: value };
       persistToStorage(updated);
       return updated;
     });
+
+    // Auto-advance to next question for single-selection types
+    if (autoAdvanceTypes.includes(currentQuestion?.exerciseType) && currentIndex < total - 1) {
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = setTimeout(() => {
+        navigateTo(currentIndex + 1, "left");
+      }, 350);
+    }
   }
 
   function handleMultiSelectToggle(key: string) {

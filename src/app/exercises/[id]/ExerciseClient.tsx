@@ -170,6 +170,16 @@ export default function ExerciseClient({
     }, 200);
   }
 
+  const autoAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
+    };
+  }, []);
+
+  const autoAdvanceTypes = ["single_choice", "qcm", "true_false"];
+
   function handleAnswer(questionId: number, value: string) {
     const updated = { ...userAnswers, [questionId]: value };
     setUserAnswers(updated);
@@ -186,6 +196,14 @@ export default function ExerciseClient({
       scheduleSave(updated);
     } else {
       saveAnswers(updated);
+    }
+
+    // Auto-advance to next question for single-selection types
+    if (autoAdvanceTypes.includes(exercise.type) && !isLabyrinth && currentIndex < totalQuestions - 1) {
+      if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
+      autoAdvanceRef.current = setTimeout(() => {
+        navigateTo(currentIndex + 1, "left");
+      }, 350);
     }
   }
 
@@ -851,10 +869,36 @@ export default function ExerciseClient({
                 value={userAnswers[currentQuestion.id] || ""}
                 onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                 onBlur={() => saveAnswers(userAnswers)}
+                onKeyDown={(e) => {
+                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && currentIndex < totalQuestions - 1) {
+                    e.preventDefault();
+                    saveAnswers(userAnswers);
+                    navigateTo(currentIndex + 1, "left");
+                  }
+                }}
                 rows={4}
                 placeholder="Votre réponse..."
                 className="exercise-textarea"
               />
+              {currentIndex < totalQuestions - 1 && (
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs text-foreground/30 hidden sm:inline">
+                    Ctrl+Entrée pour passer à la suite
+                  </span>
+                  <button
+                    onClick={() => {
+                      saveAnswers(userAnswers);
+                      navigateTo(currentIndex + 1, "left");
+                    }}
+                    className="text-xs text-primary/70 hover:text-primary font-medium flex items-center gap-1 transition-colors ml-auto cursor-pointer"
+                  >
+                    Question suivante
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

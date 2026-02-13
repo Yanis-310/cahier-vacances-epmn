@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
+import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0569C8",
+  themeColor: "#930137",
 };
 
 export default function RootLayout({
@@ -43,6 +44,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.variable} antialiased`}>
         <Providers>{children}</Providers>
+        <InstallPrompt />
         <script
           dangerouslySetInnerHTML={{
             __html: `
