@@ -12,6 +12,24 @@ interface ProfileClientProps {
   };
 }
 
+function InfoCard({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-foreground/8 bg-white p-5 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/35">{label}</p>
+      <p className="mt-2 text-lg font-semibold text-foreground">{value}</p>
+      {hint && <p className="mt-1 text-sm text-foreground/45">{hint}</p>}
+    </div>
+  );
+}
+
 export default function ProfileClient({ user }: ProfileClientProps) {
   const { update: updateSession } = useSession();
   const router = useRouter();
@@ -54,7 +72,9 @@ export default function ProfileClient({ user }: ProfileClientProps) {
     }
 
     if (newPassword && !isNewPasswordValid) {
-      setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial.");
+      setError(
+        "Le mot de passe doit contenir au moins 8 caract\u00E8res, une majuscule et un caract\u00E8re sp\u00E9cial."
+      );
       return;
     }
 
@@ -75,7 +95,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Erreur lors de la mise à jour.");
+        setError(data.error || "Erreur lors de la mise \u00E0 jour.");
         setLoading(false);
         return;
       }
@@ -86,7 +106,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setSuccess("Profil mis à jour avec succès.");
+      setSuccess("Profil mis \u00E0 jour avec succ\u00E8s.");
     } catch {
       setError("Erreur de connexion au serveur.");
     }
@@ -95,194 +115,174 @@ export default function ProfileClient({ user }: ProfileClientProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* User identity card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
-        <div className="flex items-center gap-5">
-          <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-lg font-bold leading-none">
-              {initials}
-            </span>
-          </div>
-          <div>
-            <p className="text-xl font-bold text-foreground">{user.name}</p>
-            <p className="text-sm text-foreground/45 mt-0.5">{user.email}</p>
-            <p className="text-xs text-foreground/25 mt-1">
-              Membre depuis le {memberSince}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Messages */}
-        {error && (
-          <div className="bg-error/10 text-error text-sm px-4 py-3 rounded-xl">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-success/10 text-success text-sm px-4 py-3 rounded-xl">
-            {success}
-          </div>
-        )}
-
-        {/* Informations card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-6">
-            Informations personnelles
-          </h2>
-
-          <div className="space-y-5">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-foreground/70 mb-1.5"
-              >
-                Nom complet
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
-              />
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <aside className="space-y-4 lg:col-span-1">
+        <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary">
+              <span className="text-lg font-bold leading-none text-white">{initials}</span>
             </div>
-
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-foreground/70 mb-1.5"
-              >
-                Adresse email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
-              />
+              <p className="text-lg font-bold text-foreground">{user.name}</p>
+              <p className="text-sm text-foreground/45">{user.email}</p>
             </div>
           </div>
+          <p className="mt-4 border-t border-foreground/8 pt-3 text-xs text-foreground/35">
+            Membre depuis le {memberSince}
+          </p>
         </div>
 
-        {/* Security card */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-6">
-            Sécurité
-          </h2>
+        <InfoCard label="Nom" value={name} hint="Affich\u00E9 dans la navigation" />
+        <InfoCard label="Email" value={email} hint="Adresse de connexion" />
 
-          <div className="space-y-5">
-            <div>
-              <label
-                htmlFor="currentPassword"
-                className="block text-sm font-medium text-foreground/70 mb-1.5"
-              >
-                Mot de passe actuel
-              </label>
-              <input
-                id="currentPassword"
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                required
-                className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
+        <div className="rounded-2xl border border-foreground/8 bg-white p-4 shadow-sm">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-foreground/10 px-4 py-2.5 text-sm font-medium text-foreground/60 transition hover:border-error/30 hover:text-error cursor-pointer"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.7}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
-              <p className="text-xs text-foreground/30 mt-1.5">
-                Requis pour valider toute modification
-              </p>
-            </div>
+            </svg>
+            Se d\u00E9connecter
+          </button>
+        </div>
+      </aside>
 
-            <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-sm font-medium text-foreground/70 mb-1.5"
-              >
-                Nouveau mot de passe
-                <span className="text-foreground/30 font-normal ml-1.5">
-                  optionnel
-                </span>
-              </label>
-              <input
-                id="newPassword"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                minLength={8}
-                className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
-              />
-              {newPassword.length > 0 && (
-                <ul className="text-xs mt-1.5 space-y-0.5">
-                  <li className={hasMinLength ? "text-success" : "text-foreground/40"}>
-                    {hasMinLength ? "\u2713" : "\u2717"} 8 caractères minimum
-                  </li>
-                  <li className={hasUppercase ? "text-success" : "text-foreground/40"}>
-                    {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
-                  </li>
-                  <li className={hasSpecial ? "text-success" : "text-foreground/40"}>
-                    {hasSpecial ? "\u2713" : "\u2717"} Un caractère spécial
-                  </li>
-                </ul>
-              )}
+      <section className="lg:col-span-2">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="rounded-xl border border-error/25 bg-error/10 px-4 py-3 text-sm text-error">
+              {error}
             </div>
+          )}
+          {success && (
+            <div className="rounded-xl border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
+              {success}
+            </div>
+          )}
 
-            {newPassword && (
+          <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-lg font-semibold text-foreground">Informations personnelles</h2>
+            <p className="mt-1 text-sm text-foreground/45">Mettez \u00E0 jour vos informations de base.</p>
+
+            <div className="mt-6 space-y-5">
               <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-foreground/70 mb-1.5"
-                >
-                  Confirmer le nouveau mot de passe
+                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-foreground/70">
+                  Nom complet
                 </label>
                 <input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 border border-foreground/10 rounded-xl bg-transparent text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-colors"
+                  className="w-full rounded-xl border border-foreground/12 bg-white px-4 py-2.5 text-foreground transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
-            )}
+
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-foreground/70">
+                  Adresse email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-foreground/12 bg-white px-4 py-2.5 text-foreground transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Save button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary-light transition-colors disabled:opacity-50 cursor-pointer"
-        >
-          {loading ? "Enregistrement..." : "Enregistrer les modifications"}
-        </button>
-      </form>
+          <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="text-lg font-semibold text-foreground">S\u00E9curit\u00E9</h2>
+            <p className="mt-1 text-sm text-foreground/45">Changez votre mot de passe si n\u00E9cessaire.</p>
 
-      {/* Logout — subtle, at the bottom */}
-      <div className="pt-4 border-t border-foreground/[0.06]">
-        <button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex items-center gap-2 text-sm text-foreground/35 hover:text-error transition-colors cursor-pointer"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+            <div className="mt-6 space-y-5">
+              <div>
+                <label
+                  htmlFor="currentPassword"
+                  className="mb-1.5 block text-sm font-medium text-foreground/70"
+                >
+                  Mot de passe actuel
+                </label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-foreground/12 bg-white px-4 py-2.5 text-foreground transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <p className="mt-1.5 text-xs text-foreground/35">Requis pour valider toute modification.</p>
+              </div>
+
+              <div>
+                <label htmlFor="newPassword" className="mb-1.5 block text-sm font-medium text-foreground/70">
+                  Nouveau mot de passe
+                  <span className="ml-1.5 font-normal text-foreground/35">optionnel</span>
+                </label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={8}
+                  className="w-full rounded-xl border border-foreground/12 bg-white px-4 py-2.5 text-foreground transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+
+                {newPassword.length > 0 && (
+                  <ul className="mt-1.5 space-y-0.5 text-xs">
+                    <li className={hasMinLength ? "text-success" : "text-foreground/45"}>
+                      {hasMinLength ? "\u2713" : "\u2717"} 8 caract\u00E8res minimum
+                    </li>
+                    <li className={hasUppercase ? "text-success" : "text-foreground/45"}>
+                      {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
+                    </li>
+                    <li className={hasSpecial ? "text-success" : "text-foreground/45"}>
+                      {hasSpecial ? "\u2713" : "\u2717"} Un caract\u00E8re sp\u00E9cial
+                    </li>
+                  </ul>
+                )}
+              </div>
+
+              {newPassword && (
+                <div>
+                  <label
+                    htmlFor="confirmPassword"
+                    className="mb-1.5 block text-sm font-medium text-foreground/70"
+                  >
+                    Confirmer le nouveau mot de passe
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    className="w-full rounded-xl border border-foreground/12 bg-white px-4 py-2.5 text-foreground transition-colors focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-primary py-3 font-medium text-white transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          Se déconnecter
-        </button>
-      </div>
+            {loading ? "Enregistrement..." : "Enregistrer les modifications"}
+          </button>
+        </form>
+      </section>
     </div>
   );
 }

@@ -23,24 +23,31 @@ export default async function ProfilePage() {
   return (
     <>
       <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground">
-            Mon profil
-          </h1>
-          <p className="text-foreground/50 mt-2 text-lg">
-            Gérez vos informations et vos paramètres de compte.
-          </p>
-        </div>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <section className="overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm">
+          <div className="h-1.5 w-full bg-primary/80" />
+          <div className="bg-primary-pale/25 p-6 sm:p-8">
+            <p className="inline-flex items-center rounded-full border border-primary/20 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+              Espace personnel
+            </p>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Mon profil
+            </h1>
+            <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
+              G\u00E9rez vos informations et vos param\u00E8tres de compte.
+            </p>
+          </div>
+        </section>
 
-        <ProfileClient
-          user={{
-            name: user.name,
-            email: user.email,
-            createdAt: user.createdAt.toISOString(),
-          }}
-        />
+        <section className="mt-8">
+          <ProfileClient
+            user={{
+              name: user.name,
+              email: user.email,
+              createdAt: user.createdAt.toISOString(),
+            }}
+          />
+        </section>
       </main>
     </>
   );
