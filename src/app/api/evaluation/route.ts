@@ -8,30 +8,43 @@ export async function POST() {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  // Get all auto-gradable exercises (exclude free_text and labyrinth)
-  const exercises = await prisma.exercise.findMany({
-    where: { type: { notIn: ["free_text", "labyrinth"] } },
-  });
+  try {
+    // Get all auto-gradable exercises (exclude free_text and labyrinth)
+    const exercises = await prisma.exercise.findMany({
+      where: { type: { notIn: ["free_text", "labyrinth"] } },
+      select: { id: true, content: true, type: true },
+    });
 
-  // Collect all individual questions
-  type QuestionRef = { exerciseId: string; questionId: number };
-  const allQuestions: QuestionRef[] = [];
+    // Collect all individual questions
+    type QuestionRef = { exerciseId: string; questionId: number };
+    const allQuestions: QuestionRef[] = [];
 
-  for (const ex of exercises) {
-    const content = ex.content as { questions?: { id: number }[] };
-    if (content.questions) {
-      for (const q of content.questions) {
-        allQuestions.push({ exerciseId: ex.id, questionId: q.id });
+    for (const ex of exercises) {
+      const content = ex.content as { questions?: { id: number }[] };
+      if (content.questions) {
+        for (const q of content.questions) {
+          allQuestions.push({ exerciseId: ex.id, questionId: q.id });
+        }
       }
     }
-  }
 
-  // Randomly pick 20 questions (or fewer if not enough)
-  const count = Math.min(20, allQuestions.length);
-  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, count);
+    if (allQuestions.length === 0) {
+      return NextResponse.json(
+        { error: "Aucune question disponible." },
+        { status: 400 }
+      );
+    }
 
-  try {
+    // Fisher-Yates shuffle
+    const shuffled = [...allQuestions];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    const count = Math.min(20, shuffled.length);
+    const selected = shuffled.slice(0, count);
+
     const evaluation = await prisma.evaluation.create({
       data: {
         userId: session.user.id,

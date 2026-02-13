@@ -23,33 +23,37 @@ export async function POST(request: Request) {
 
   const email = parsed.data.email.trim().toLowerCase();
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
 
-  if (user) {
-    // Delete any existing tokens for this user
-    await prisma.passwordResetToken.deleteMany({
-      where: { userId: user.id },
-    });
+    if (user) {
+      // Delete any existing tokens for this user
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
 
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-    await prisma.passwordResetToken.create({
-      data: {
-        userId: user.id,
-        token,
-        expiresAt,
-      },
-    });
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token,
+          expiresAt,
+        },
+      });
 
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
-    try {
-      await sendPasswordResetEmail(email, resetUrl);
-    } catch (err) {
-      console.error("Failed to send reset email:", err);
+      try {
+        await sendPasswordResetEmail(email, resetUrl);
+      } catch (err) {
+        console.error("Failed to send reset email:", err);
+      }
     }
+  } catch (err) {
+    console.error("Forgot password error:", err);
   }
 
   // Always return success to avoid leaking whether the email exists

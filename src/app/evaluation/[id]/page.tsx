@@ -36,7 +36,9 @@ export default async function EvaluationTakePage({
   const exerciseMap = new Map(exercises.map((e) => [e.id, e]));
 
   // Build structured questions for the client
-  const questions = questionIds.map((qRef, index) => {
+  const questions = questionIds
+    .filter((qRef) => exerciseMap.has(qRef.exerciseId))
+    .map((qRef, index) => {
     const exercise = exerciseMap.get(qRef.exerciseId)!;
     const content = exercise.content as {
       instruction?: string;

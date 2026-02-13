@@ -32,15 +32,16 @@ export default async function ExercisesPage() {
     redirect("/login");
   }
 
-  const exercises = await prisma.exercise.findMany({
-    orderBy: { number: "asc" },
-    select: { id: true, number: true, title: true, type: true },
-  });
-
-  const progress = await prisma.userProgress.findMany({
-    where: { userId: session.user.id },
-    select: { exerciseId: true, completed: true },
-  });
+  const [exercises, progress] = await Promise.all([
+    prisma.exercise.findMany({
+      orderBy: { number: "asc" },
+      select: { id: true, number: true, title: true, type: true },
+    }),
+    prisma.userProgress.findMany({
+      where: { userId: session.user.id },
+      select: { exerciseId: true, completed: true },
+    }),
+  ]);
 
   const progressMap = new Map(
     progress.map((p) => [p.exerciseId, p.completed])

@@ -120,6 +120,8 @@ export default function EvaluationClient({
   // Keyboard navigation
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT") return;
       if (e.key === "ArrowRight" && currentIndex < total - 1) {
         navigateTo(currentIndex + 1, "left");
       } else if (e.key === "ArrowLeft" && currentIndex > 0) {
@@ -344,6 +346,7 @@ export default function EvaluationClient({
           onClick={() => navigateTo(currentIndex - 1, "right")}
           disabled={isFirstQuestion}
           className="exercise-nav-btn"
+          aria-label="Question précédente"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -388,6 +391,7 @@ export default function EvaluationClient({
           <button
             onClick={() => navigateTo(currentIndex + 1, "left")}
             className="exercise-nav-btn"
+            aria-label="Question suivante"
           >
             <span className="hidden sm:inline">Suivant</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

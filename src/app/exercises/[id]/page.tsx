@@ -43,13 +43,17 @@ export default async function ExercisePage({
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <ExerciseClient
+          key={exercise.id}
           exercise={{
             id: exercise.id,
             number: exercise.number,
             title: exercise.title,
             type: exercise.type,
             content: exercise.content as Record<string, unknown>,
-            answers: exercise.answers as Record<string, string>,
+            answers:
+              progress?.completed || exercise.type === "labyrinth"
+                ? (exercise.answers as Record<string, string>)
+                : null,
           }}
           savedAnswers={
             (progress?.userAnswers as Record<string, string>) || {}

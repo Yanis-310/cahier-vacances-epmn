@@ -43,13 +43,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.email) session.user.email = token.email;
       return session;
     },
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.sub = user.id;
       }
-      if (trigger === "update" && session) {
-        if (session.name) token.name = session.name;
-        if (session.email) token.email = session.email;
+      // Re-fetch from DB on session update to prevent client-side token manipulation
+      if (trigger === "update" && token.sub) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.sub },
+          select: { name: true, email: true },
+        });
+        if (dbUser) {
+          token.name = dbUser.name;
+          token.email = dbUser.email;
+        }
       }
       return token;
     },

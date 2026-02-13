@@ -40,27 +40,31 @@ export async function POST(request: Request) {
   const email = parsed.data.email.trim().toLowerCase();
   const { password } = parsed.data;
 
-  if (!name || !email || !password) {
+  try {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    await prisma.user.create({
+      data: { name, email, passwordHash },
+    });
+
+    return NextResponse.json({ success: true }, { status: 201 });
+  } catch (err) {
+    // Handle unique constraint violation (race condition on email)
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      (err as { code: string }).code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: "Un compte avec cet email existe déjà." },
+        { status: 409 }
+      );
+    }
+    console.error("Register error:", err);
     return NextResponse.json(
-      { error: "Tous les champs sont requis." },
-      { status: 400 }
+      { error: "Erreur serveur." },
+      { status: 500 }
     );
   }
-
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-
-  if (existingUser) {
-    return NextResponse.json(
-      { error: "Un compte avec cet email existe déjà." },
-      { status: 409 }
-    );
-  }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  await prisma.user.create({
-    data: { name, email, passwordHash },
-  });
-
-  return NextResponse.json({ success: true }, { status: 201 });
 }

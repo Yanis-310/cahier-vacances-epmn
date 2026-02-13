@@ -37,23 +37,28 @@ export async function POST(request: Request) {
 
   const { exerciseId, userAnswers, completed } = parsed.data;
 
-  if (!exerciseId) {
-    return NextResponse.json(
-      { error: "exerciseId requis" },
-      { status: 400 }
-    );
-  }
-
-  const exercise = await prisma.exercise.findUnique({
-    where: { id: exerciseId },
-    select: { id: true },
-  });
-
-  if (!exercise) {
-    return NextResponse.json({ error: "Exercice introuvable." }, { status: 404 });
-  }
-
   try {
+    const exercise = await prisma.exercise.findUnique({
+      where: { id: exerciseId },
+      select: { id: true, answers: true },
+    });
+
+    if (!exercise) {
+      return NextResponse.json({ error: "Exercice introuvable." }, { status: 404 });
+    }
+
+    // Don't allow completed to regress back to false
+    const existingProgress = completed
+      ? null
+      : await prisma.userProgress.findUnique({
+          where: {
+            userId_exerciseId: { userId: session.user.id, exerciseId },
+          },
+          select: { completed: true },
+        });
+
+    const finalCompleted = completed || (existingProgress?.completed ?? false);
+
     await prisma.userProgress.upsert({
       where: {
         userId_exerciseId: {
@@ -63,15 +68,24 @@ export async function POST(request: Request) {
       },
       update: {
         userAnswers,
-        completed: completed ?? false,
+        completed: finalCompleted,
       },
       create: {
         userId: session.user.id,
         exerciseId,
         userAnswers,
-        completed: completed ?? false,
+        completed: finalCompleted,
       },
     });
+
+    revalidatePath("/exercises");
+
+    // Return answers only when marking as completed (for correction display)
+    if (completed) {
+      return NextResponse.json({ success: true, answers: exercise.answers });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Progress save error:", err);
     return NextResponse.json(
@@ -79,8 +93,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-
-  revalidatePath("/exercises");
-
-  return NextResponse.json({ success: true });
 }

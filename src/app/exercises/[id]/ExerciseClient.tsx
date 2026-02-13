@@ -28,7 +28,7 @@ interface ExerciseData {
     questions?: Question[];
     columns?: { left: string; right: string };
   };
-  answers: Record<string, unknown>;
+  answers: Record<string, unknown> | null;
 }
 
 interface Props {
@@ -48,6 +48,9 @@ export default function ExerciseClient({
 }: Props) {
   const [userAnswers, setUserAnswers] =
     useState<Record<string, string>>(savedAnswers);
+  const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, unknown> | null>(
+    exercise.answers
+  );
   const [showCorrection, setShowCorrection] = useState(isCompleted);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -82,7 +85,7 @@ export default function ExerciseClient({
   // Labyrinth helpers (kept as-is)
   function isLabStepCorrect(questionId: number): boolean {
     const userAnswer = userAnswers[questionId];
-    const correctAnswer = exercise.answers[questionId] as string;
+    const correctAnswer = exerciseAnswers?.[questionId] as string;
     return !!userAnswer && userAnswer === correctAnswer;
   }
 
@@ -98,7 +101,7 @@ export default function ExerciseClient({
     isLabyrinth && questions.length > 0 && questions.every((q) => isLabStepCorrect(q.id));
 
   const saveAnswers = useCallback(
-    async (answers: Record<string, string>, completed = false) => {
+    async (answers: Record<string, string>, completed = false): Promise<boolean> => {
       setSaving(true);
       setSaveError(null);
       setSaveSuccess(false);
@@ -114,13 +117,22 @@ export default function ExerciseClient({
         });
         if (!res.ok) {
           setSaveError("Échec de la sauvegarde.");
-        } else {
-          setSaveSuccess(true);
-          if (saveSuccessTimerRef.current) clearTimeout(saveSuccessTimerRef.current);
-          saveSuccessTimerRef.current = setTimeout(() => setSaveSuccess(false), 1500);
+          return false;
         }
+        // When completing, the API returns the exercise answers for correction
+        if (completed) {
+          const data = await res.json();
+          if (data.answers) {
+            setExerciseAnswers(data.answers);
+          }
+        }
+        setSaveSuccess(true);
+        if (saveSuccessTimerRef.current) clearTimeout(saveSuccessTimerRef.current);
+        saveSuccessTimerRef.current = setTimeout(() => setSaveSuccess(false), 1500);
+        return true;
       } catch {
         setSaveError("Échec de la sauvegarde.");
+        return false;
       } finally {
         setSaving(false);
       }
@@ -149,6 +161,8 @@ export default function ExerciseClient({
   useEffect(() => {
     if (isLabyrinth) return;
     function handleKeyDown(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT") return;
       if (e.key === "ArrowRight" && currentIndex < totalQuestions - 1) {
         navigateTo(currentIndex + 1, "left");
       } else if (e.key === "ArrowLeft" && currentIndex > 0) {
@@ -188,7 +202,7 @@ export default function ExerciseClient({
     if (isLabyrinth) {
       const willBeComplete = questions.every((q) => {
         const ans = q.id === questionId ? value : (updated as Record<number, string>)[q.id];
-        const correct = (exercise.answers as Record<number, string>)[q.id];
+        const correct = (exerciseAnswers as Record<number, string>)?.[q.id];
         return !!ans && ans === correct;
       });
       saveAnswers(updated, willBeComplete);
@@ -217,8 +231,10 @@ export default function ExerciseClient({
 
   async function handleCheck() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    await saveAnswers(userAnswers, true);
-    setShowCorrection(true);
+    const success = await saveAnswers(userAnswers, true);
+    if (success) {
+      setShowCorrection(true);
+    }
   }
 
   function getStatus(questionId: number): "correct" | "incorrect" | null {
@@ -226,14 +242,14 @@ export default function ExerciseClient({
     if (exercise.type === "free_text") return null;
 
     if (exercise.type === "multi_select") {
-      const correctIds = (exercise.answers as { correctIds: number[] }).correctIds;
+      const correctIds = (exerciseAnswers as { correctIds: number[] })?.correctIds ?? [];
       const isSelected = userAnswers[questionId] === "true";
       const shouldBeSelected = correctIds.includes(questionId);
       return isSelected === shouldBeSelected ? "correct" : "incorrect";
     }
 
     const userAnswer = userAnswers[questionId];
-    const correctAnswer = exercise.answers[questionId] as string;
+    const correctAnswer = exerciseAnswers?.[questionId] as string;
     if (!userAnswer) return "incorrect";
     return userAnswer === correctAnswer ? "correct" : "incorrect";
   }
@@ -346,7 +362,7 @@ export default function ExerciseClient({
                     <div className="space-y-2 ml-10">
                       {q.options.map((opt) => {
                         const isSelected = userAnswers[q.id] === opt.label;
-                        const isCorrectOpt = (exercise.answers[q.id] as string) === opt.label;
+                        const isCorrectOpt = (exerciseAnswers?.[q.id] as string) === opt.label;
 
                         let btnClass =
                           "border-foreground/10 hover:border-primary/50";
@@ -433,14 +449,14 @@ export default function ExerciseClient({
         return;
       }
       if (exercise.type === "multi_select") {
-        const correctIds = (exercise.answers as { correctIds: number[] }).correctIds;
+        const correctIds = (exerciseAnswers as { correctIds: number[] })?.correctIds ?? [];
         const isSelected = userAnswers[q.id] === "true";
         const shouldBeSelected = correctIds.includes(q.id);
         if (isSelected === shouldBeSelected) correct++;
         else incorrect++;
       } else {
         const userAnswer = userAnswers[q.id];
-        const correctAnswer = exercise.answers[q.id] as string;
+        const correctAnswer = exerciseAnswers?.[q.id] as string;
         if (userAnswer && userAnswer === correctAnswer) correct++;
         else incorrect++;
       }
@@ -448,12 +464,13 @@ export default function ExerciseClient({
     return { correct, incorrect, total: correct + incorrect };
   };
 
-  function handleRestart() {
+  async function handleRestart() {
     if (!confirm("Recommencer cet exercice ? Toutes vos réponses seront effacées.")) return;
     setUserAnswers({});
     setShowCorrection(false);
+    setExerciseAnswers(null);
     setCurrentIndex(0);
-    saveAnswers({}, false);
+    await saveAnswers({}, false);
   }
 
   const status = currentQuestion ? getStatus(currentQuestion.id) : null;
@@ -516,7 +533,7 @@ export default function ExerciseClient({
             <div className="mt-4 h-1.5 bg-foreground/[0.06] rounded-full overflow-hidden">
               <div
                 className="h-full bg-success rounded-full transition-all duration-700 ease-out"
-                style={{ width: `${(score.correct / score.total) * 100}%` }}
+                style={{ width: score.total > 0 ? `${(score.correct / score.total) * 100}%` : "0%" }}
               />
             </div>
           </div>
@@ -588,7 +605,7 @@ export default function ExerciseClient({
                       <div className="exercise-correction mt-2">
                         <span className="text-foreground/40 text-xs uppercase tracking-wide font-medium">Réponse attendue</span>
                         <p className="text-sm font-medium text-foreground/70 mt-0.5">
-                          {exercise.answers[q.id] as string}
+                          {exerciseAnswers?.[q.id] as string}
                         </p>
                       </div>
                     )}
@@ -596,7 +613,7 @@ export default function ExerciseClient({
                     {qStatus === "incorrect" && exercise.type === "multi_select" && (
                       <div className="exercise-correction mt-2">
                         <p className="text-sm text-foreground/70">
-                          {(exercise.answers as { correctIds: number[] }).correctIds.includes(q.id)
+                          {((exerciseAnswers as { correctIds: number[] })?.correctIds ?? []).includes(q.id)
                             ? "Cette proposition est une bonne posture."
                             : "Cette proposition n'est pas une bonne posture."}
                         </p>
@@ -615,7 +632,7 @@ export default function ExerciseClient({
                     <div className="exercise-correction">
                       <span className="text-foreground/40 text-xs uppercase tracking-wide font-medium">Réponse attendue</span>
                       <p className="text-sm text-foreground/70 mt-0.5">
-                        {exercise.answers[q.id] as string}
+                        {exerciseAnswers?.[q.id] as string}
                       </p>
                     </div>
                   </div>
@@ -916,6 +933,7 @@ export default function ExerciseClient({
           onClick={() => navigateTo(currentIndex - 1, "right")}
           disabled={isFirstQuestion}
           className="exercise-nav-btn"
+          aria-label="Question précédente"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -960,6 +978,7 @@ export default function ExerciseClient({
             onClick={() => navigateTo(currentIndex + 1, "left")}
             disabled={isLastQuestion}
             className="exercise-nav-btn"
+            aria-label="Question suivante"
           >
             <span className="hidden sm:inline">Suivant</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

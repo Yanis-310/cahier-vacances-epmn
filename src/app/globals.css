@@ -13,10 +13,10 @@
 }
 
 body {
-  background: #F3F4F6;
-  color: #1F2937;
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  accent-color: #0569C8;
+  accent-color: var(--color-primary);
 }
 
 /* Override browser default blue on all form elements */
@@ -24,21 +24,21 @@ input,
 select,
 textarea,
 button {
-  accent-color: #0569C8;
+  accent-color: var(--color-primary);
 }
 
 input:focus,
 select:focus,
 textarea:focus {
-  outline-color: #0569C8;
+  outline-color: var(--color-primary);
 }
 
 *:focus {
-  outline-color: #0569C8;
+  outline-color: var(--color-primary);
 }
 
 ::selection {
-  background-color: #0569C8;
+  background-color: var(--color-primary);
   color: white;
 }
 
@@ -174,11 +174,11 @@ textarea:focus {
   justify-content: center;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1.5px solid rgba(31, 41, 55, 0.1);
+  border: 1.5px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
   background: transparent;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(31, 41, 55, 0.7);
+  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
@@ -186,20 +186,20 @@ textarea:focus {
 }
 
 .exercise-pill:hover {
-  border-color: rgba(5, 105, 200, 0.3);
-  background: rgba(5, 105, 200, 0.03);
-  color: #0569C8;
+  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 3%, transparent);
+  color: var(--color-primary);
 }
 
 .exercise-pill-active {
-  border-color: #0569C8;
-  background: #0569C8;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: white;
 }
 
 .exercise-pill-active:hover {
-  border-color: #2580DB;
-  background: #2580DB;
+  border-color: var(--color-primary-light);
+  background: var(--color-primary-light);
   color: white;
 }
 
@@ -212,27 +212,27 @@ textarea:focus {
   text-align: left;
   padding: 14px 16px;
   border-radius: 10px;
-  border: 1.5px solid rgba(31, 41, 55, 0.08);
+  border: 1.5px solid color-mix(in srgb, var(--color-foreground) 8%, transparent);
   background: transparent;
   cursor: pointer;
   transition: all 0.15s ease;
-  color: rgba(31, 41, 55, 0.75);
+  color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
 }
 
 .exercise-option-card:hover {
-  border-color: rgba(5, 105, 200, 0.2);
-  background: rgba(5, 105, 200, 0.02);
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 2%, transparent);
 }
 
 .exercise-option-card-active {
-  border-color: #0569C8;
-  background: rgba(5, 105, 200, 0.05);
-  color: #1F2937;
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  color: var(--color-foreground);
 }
 
 .exercise-option-card-active:hover {
-  border-color: #0569C8;
-  background: rgba(5, 105, 200, 0.07);
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
 }
 
 .exercise-option-label {
@@ -242,16 +242,16 @@ textarea:focus {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: rgba(31, 41, 55, 0.06);
+  background: color-mix(in srgb, var(--color-foreground) 6%, transparent);
   font-size: 12px;
   font-weight: 600;
-  color: rgba(31, 41, 55, 0.5);
+  color: color-mix(in srgb, var(--color-foreground) 50%, transparent);
   flex-shrink: 0;
   transition: all 0.15s ease;
 }
 
 .exercise-option-card-active .exercise-option-label {
-  background: #0569C8;
+  background: var(--color-primary);
   color: white;
 }
 
@@ -263,15 +263,15 @@ textarea:focus {
   width: 20px;
   height: 20px;
   border-radius: 5px;
-  border: 1.5px solid rgba(31, 41, 55, 0.2);
+  border: 1.5px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
   flex-shrink: 0;
   transition: all 0.15s ease;
   margin-top: 1px;
 }
 
 .exercise-checkbox-active {
-  background: #0569C8;
-  border-color: #0569C8;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 /* True/False cards */
@@ -283,30 +283,30 @@ textarea:focus {
   gap: 4px;
   padding: 20px 16px;
   border-radius: 10px;
-  border: 1.5px solid rgba(31, 41, 55, 0.08);
+  border: 1.5px solid color-mix(in srgb, var(--color-foreground) 8%, transparent);
   background: transparent;
   font-size: 15px;
   font-weight: 600;
-  color: rgba(31, 41, 55, 0.55);
+  color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .exercise-tf-card:hover {
-  border-color: rgba(5, 105, 200, 0.25);
-  background: rgba(5, 105, 200, 0.02);
-  color: rgba(31, 41, 55, 0.75);
+  border-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 2%, transparent);
+  color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
 }
 
 .exercise-tf-card-active {
-  border-color: #0569C8;
-  background: #0569C8;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: white;
 }
 
 .exercise-tf-card-active:hover {
-  border-color: #2580DB;
-  background: #2580DB;
+  border-color: var(--color-primary-light);
+  background: var(--color-primary-light);
   color: white;
 }
 
@@ -314,32 +314,32 @@ textarea:focus {
 .exercise-textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 1.5px solid rgba(31, 41, 55, 0.1);
+  border: 1.5px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
   border-radius: 10px;
   font-size: 14px;
   line-height: 1.6;
-  color: #1F2937;
+  color: var(--color-foreground);
   background: transparent;
   resize: vertical;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .exercise-textarea::placeholder {
-  color: rgba(31, 41, 55, 0.25);
+  color: color-mix(in srgb, var(--color-foreground) 25%, transparent);
 }
 
 .exercise-textarea:focus {
   outline: none;
-  border-color: rgba(5, 105, 200, 0.4);
-  box-shadow: 0 0 0 3px rgba(5, 105, 200, 0.06);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 6%, transparent);
 }
 
 /* Correction box */
 .exercise-correction {
   padding: 12px 14px;
-  background: rgba(5, 105, 200, 0.04);
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
   border-radius: 8px;
-  border-left: 3px solid rgba(5, 105, 200, 0.3);
+  border-left: 3px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
 }
 
 /* Dots container — scrollable on mobile, wraps on desktop */
@@ -384,24 +384,24 @@ textarea:focus {
 }
 
 .exercise-dot-current {
-  background: #0569C8;
+  background: var(--color-primary);
   transform: scale(1.25);
 }
 
 .exercise-dot-answered {
-  background: rgba(5, 105, 200, 0.35);
+  background: color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 
 .exercise-dot-answered:hover {
-  background: rgba(5, 105, 200, 0.55);
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
 }
 
 .exercise-dot-empty {
-  background: rgba(31, 41, 55, 0.1);
+  background: color-mix(in srgb, var(--color-foreground) 10%, transparent);
 }
 
 .exercise-dot-empty:hover {
-  background: rgba(31, 41, 55, 0.2);
+  background: color-mix(in srgb, var(--color-foreground) 20%, transparent);
 }
 
 /* Navigation buttons */
@@ -411,18 +411,18 @@ textarea:focus {
   gap: 6px;
   padding: 8px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(31, 41, 55, 0.1);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
   background: transparent;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(31, 41, 55, 0.5);
+  color: color-mix(in srgb, var(--color-foreground) 50%, transparent);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .exercise-nav-btn:hover:not(:disabled) {
-  border-color: rgba(31, 41, 55, 0.2);
-  color: rgba(31, 41, 55, 0.7);
+  border-color: color-mix(in srgb, var(--color-foreground) 20%, transparent);
+  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
   background: white;
 }
 
@@ -432,14 +432,14 @@ textarea:focus {
 }
 
 .exercise-nav-btn-primary {
-  border-color: #0569C8;
-  background: #0569C8;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: white;
 }
 
 .exercise-nav-btn-primary:hover:not(:disabled) {
-  background: #2580DB;
-  border-color: #2580DB;
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-light);
   color: white;
 }
 
@@ -454,18 +454,18 @@ textarea:focus {
   background: transparent;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(31, 41, 55, 0.4);
+  color: color-mix(in srgb, var(--color-foreground) 40%, transparent);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .exercise-exnav-btn:hover {
-  color: #0569C8;
-  background: rgba(5, 105, 200, 0.04);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
 }
 
 .exercise-exnav-btn:active {
-  background: rgba(5, 105, 200, 0.08);
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
 }
 
 /* ═══════════════════════════════════════

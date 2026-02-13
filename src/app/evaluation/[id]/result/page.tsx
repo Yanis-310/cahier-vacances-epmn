@@ -68,7 +68,9 @@ export default async function EvaluationResultPage({
   const circumference = 2 * Math.PI * 54;
 
   // Build detailed results
-  const details = questionIds.map((qRef, index) => {
+  const details = questionIds
+    .filter((qRef) => exerciseMap.has(qRef.exerciseId))
+    .map((qRef, index) => {
     const exercise = exerciseMap.get(qRef.exerciseId)!;
     const content = exercise.content as {
       options?: string[];

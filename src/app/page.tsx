@@ -14,7 +14,7 @@ export default async function Home() {
 }
 
 async function Dashboard({ userId, userName }: { userId: string; userName: string }) {
-  const [progressList, exerciseCount, lastEvaluation] = await Promise.all([
+  const [progressList, exerciseCount, lastEvaluation, lastProgress] = await Promise.all([
     prisma.userProgress.findMany({
       where: { userId, completed: true },
       orderBy: { updatedAt: "desc" },
@@ -26,15 +26,14 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
       orderBy: { completedAt: "desc" },
       select: { score: true, total: true, completedAt: true },
     }),
+    prisma.userProgress.findFirst({
+      where: { userId },
+      orderBy: { updatedAt: "desc" },
+      select: { exercise: { select: { number: true, title: true, id: true } } },
+    }),
   ]);
 
   const completedCount = progressList.length;
-
-  const lastProgress = await prisma.userProgress.findFirst({
-    where: { userId },
-    orderBy: { updatedAt: "desc" },
-    select: { exercise: { select: { number: true, title: true, id: true } } },
-  });
 
   const progressPercent = exerciseCount > 0 ? Math.round((completedCount / exerciseCount) * 100) : 0;
 

@@ -59,10 +59,7 @@ export default function Navbar() {
                 <div className="w-px h-5 bg-foreground/10 mx-3" />
 
                 {/* User area — grouped on the right */}
-                <Link
-                  href="/profile"
-                  className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors cursor-pointer"
-                >
+                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg">
                   <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                     <span className="text-white text-xs font-semibold leading-none">
                       {initials}
@@ -71,7 +68,7 @@ export default function Navbar() {
                   <span className="text-sm font-medium text-foreground/70">
                     {session.user?.name}
                   </span>
-                </Link>
+                </div>
               </>
             ) : (
               <>
@@ -158,13 +155,6 @@ export default function Navbar() {
                   className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/evaluation") ? "text-primary bg-primary-pale/50 font-medium" : "text-foreground/70 hover:bg-primary-pale hover:text-primary"}`}
                 >
                   Évaluation
-                </Link>
-                <Link
-                  href="/profile"
-                  onClick={() => setMenuOpen(false)}
-                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/profile") ? "text-primary bg-primary-pale/50 font-medium" : "text-foreground/70 hover:bg-primary-pale hover:text-primary"}`}
-                >
-                  Mon profil
                 </Link>
                 <div className="px-3 py-2">
                   <InstallButton />

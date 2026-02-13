@@ -44,49 +44,58 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: firstError }, { status: 400 });
   }
 
-  const { name, email, currentPassword, newPassword } = parsed.data;
+  const { name, currentPassword, newPassword } = parsed.data;
+  const email = parsed.data.email.trim().toLowerCase();
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-  });
-
-  if (!user) {
-    return NextResponse.json({ error: "Utilisateur introuvable." }, { status: 404 });
-  }
-
-  const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
-  if (!isValid) {
-    return NextResponse.json(
-      { error: "Mot de passe actuel incorrect." },
-      { status: 400 }
-    );
-  }
-
-  if (email !== user.email) {
-    const existing = await prisma.user.findUnique({
-      where: { email },
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
     });
-    if (existing) {
+
+    if (!user) {
+      return NextResponse.json({ error: "Utilisateur introuvable." }, { status: 404 });
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!isValid) {
+      return NextResponse.json(
+        { error: "Mot de passe actuel incorrect." },
+        { status: 400 }
+      );
+    }
+
+    const updateData: { name: string; email: string; passwordHash?: string } = {
+      name: name.trim(),
+      email,
+    };
+
+    if (newPassword) {
+      updateData.passwordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: updateData,
+    });
+
+    return NextResponse.json({ success: true, name: updateData.name, email });
+  } catch (err) {
+    // Handle unique constraint violation on email (race condition)
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      (err as { code: string }).code === "P2002"
+    ) {
       return NextResponse.json(
         { error: "Cet email est déjà utilisé." },
         { status: 400 }
       );
     }
+    console.error("Profile update error:", err);
+    return NextResponse.json(
+      { error: "Erreur serveur." },
+      { status: 500 }
+    );
   }
-
-  const updateData: { name: string; email: string; passwordHash?: string } = {
-    name,
-    email,
-  };
-
-  if (newPassword) {
-    updateData.passwordHash = await bcrypt.hash(newPassword, 10);
-  }
-
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: updateData,
-  });
-
-  return NextResponse.json({ success: true, name, email });
 }

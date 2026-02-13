@@ -34,27 +34,41 @@ export async function POST(request: Request) {
 
   const { token, password } = parsed.data;
 
-  const resetToken = await prisma.passwordResetToken.findUnique({
-    where: { token },
-  });
+  try {
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
 
-  if (!resetToken || resetToken.expiresAt < new Date()) {
+    if (!resetToken || resetToken.expiresAt < new Date()) {
+      // Clean up expired token if it exists
+      if (resetToken) {
+        await prisma.passwordResetToken.delete({ where: { id: resetToken.id } });
+      }
+      return NextResponse.json(
+        { error: "Ce lien est invalide ou a expiré." },
+        { status: 400 }
+      );
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Atomic: update password + delete token in a transaction
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: resetToken.userId },
+        data: { passwordHash },
+      }),
+      prisma.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      }),
+    ]);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Reset password error:", err);
     return NextResponse.json(
-      { error: "Ce lien est invalide ou a expiré." },
-      { status: 400 }
+      { error: "Erreur serveur." },
+      { status: 500 }
     );
   }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  await prisma.user.update({
-    where: { id: resetToken.userId },
-    data: { passwordHash },
-  });
-
-  await prisma.passwordResetToken.delete({
-    where: { id: resetToken.id },
-  });
-
-  return NextResponse.json({ success: true });
 }
