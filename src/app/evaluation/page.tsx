@@ -133,7 +133,7 @@ function MetricCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/60 bg-white/85 p-5 shadow-sm backdrop-blur">
+    <div className="rounded-xl border border-foreground/8 bg-white p-5 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/35">{label}</p>
       <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
       {hint && <p className="mt-1 text-sm text-foreground/45">{hint}</p>}
@@ -186,14 +186,12 @@ export default async function EvaluationPage() {
     <>
       <Navbar />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        <section className="relative overflow-hidden rounded-3xl border border-primary/10 bg-gradient-to-br from-white via-primary-pale/30 to-white p-6 sm:p-8 shadow-sm">
-          <div className="pointer-events-none absolute -right-12 -top-16 h-52 w-52 rounded-full bg-primary/10 blur-3xl" />
-          <div className="pointer-events-none absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-amber-300/20 blur-3xl" />
-
-          <div className="relative flex flex-col gap-7">
+        <section className="overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm">
+          <div className="h-1.5 w-full bg-primary/80" />
+          <div className="flex flex-col gap-7 bg-primary-pale/25 p-6 sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-2xl">
-                <p className="inline-flex items-center rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                <p className="inline-flex items-center rounded-full border border-primary/20 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                   Session de niveau
                 </p>
                 <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -208,7 +206,7 @@ export default async function EvaluationPage() {
                 {inProgress && (
                   <Link
                     href={`/evaluation/${inProgress.id}`}
-                    className="group flex items-center gap-3 rounded-2xl border border-warning/30 bg-white/90 px-4 py-3 text-sm font-medium text-foreground shadow-sm transition hover:border-warning/50 hover:shadow"
+                    className="group flex items-center gap-3 rounded-xl border border-warning/30 bg-white px-4 py-3 text-sm font-medium text-foreground shadow-sm transition hover:border-warning/50 hover:shadow"
                   >
                     <span className="relative flex h-2.5 w-2.5">
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-warning opacity-40" />
@@ -277,7 +275,7 @@ export default async function EvaluationPage() {
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-foreground">Historique</h2>
             {scores.length >= 2 && (
-              <div className="inline-flex items-center gap-3 rounded-full border border-foreground/10 bg-white/70 px-3 py-2">
+              <div className="inline-flex items-center gap-3 rounded-full border border-foreground/10 bg-white px-3 py-2 shadow-sm">
                 <span className="text-xs font-medium text-foreground/45">Evolution recente</span>
                 <Sparkline scores={scores} />
               </div>
