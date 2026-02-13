@@ -34,7 +34,7 @@ export default async function ProfilePage() {
               Mon profil
             </h1>
             <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
-              G\u00E9rez vos informations et vos param\u00E8tres de compte.
+              Gérez vos informations et vos paramètres de compte.
             </p>
           </div>
         </section>

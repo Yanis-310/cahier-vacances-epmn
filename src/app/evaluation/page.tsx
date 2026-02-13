@@ -116,11 +116,11 @@ function Sparkline({ scores }: { scores: number[] }) {
 }
 
 function getMotivation(count: number, avg: number): string {
-  if (count === 0) return "Lancez votre premi\u00E8re \u00E9valuation.";
+  if (count === 0) return "Lancez votre première évaluation.";
   if (avg >= 90) return "Niveau excellent, continuez.";
-  if (avg >= 75) return "Tr\u00E8s bon niveau, bravo.";
-  if (avg >= 50) return "Vous \u00EAtes en bonne voie.";
-  return "Continuez vos r\u00E9visions.";
+  if (avg >= 75) return "Très bon niveau, bravo.";
+  if (avg >= 50) return "Vous êtes en bonne voie.";
+  return "Continuez vos révisions.";
 }
 
 function MetricCard({
@@ -195,10 +195,10 @@ export default async function EvaluationPage() {
                   Session de niveau
                 </p>
                 <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                  \u00C9valuez votre progression
+                  Évaluez votre progression
                 </h1>
                 <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
-                  20 questions m\u00E9lang\u00E9es pour mesurer votre niveau r\u00E9el, puis revoir vos r\u00E9sultats de mani\u00E8re claire.
+                  20 questions mélangées pour mesurer votre niveau réel, puis revoir vos résultats de manière claire.
                 </p>
               </div>
 
@@ -212,7 +212,7 @@ export default async function EvaluationPage() {
                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-warning opacity-40" />
                       <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-warning" />
                     </span>
-                    <span>Reprendre l&apos;\u00E9valuation en cours</span>
+                    <span>Reprendre l&apos;évaluation en cours</span>
                     <svg
                       className="h-4 w-4 text-foreground/40 transition group-hover:translate-x-0.5"
                       fill="none"
@@ -236,14 +236,14 @@ export default async function EvaluationPage() {
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <MetricCard
-                label="\u00C9valuations termin\u00E9es"
+                label="Évaluations terminées"
                 value={`${completed.length}`}
                 hint={getMotivation(completed.length, avgScore)}
               />
               <MetricCard
                 label="Score moyen"
                 value={`${avgScore}%`}
-                hint="Moyenne de toutes vos \u00E9valuations termin\u00E9es"
+                hint="Moyenne de toutes vos évaluations terminées"
               />
               <MetricCard
                 label="Meilleure performance"
@@ -251,19 +251,19 @@ export default async function EvaluationPage() {
                 hint={
                   completed.length > 0
                     ? "Votre record personnel actuel"
-                    : "Pas encore de score enregistr\u00E9"
+                    : "Pas encore de score enregistré"
                 }
               />
               <MetricCard
-                label="Tendance r\u00E9cente"
+                label="Tendance récente"
                 value={trend === null ? "--" : `${trend > 0 ? "+" : ""}${trend} pts`}
                 hint={
                   trend === null
-                    ? "Compl\u00E9tez 2 \u00E9valuations pour voir la tendance"
+                    ? "Complétez 2 évaluations pour voir la tendance"
                     : trend > 0
-                      ? "Progression sur la derni\u00E8re session"
+                      ? "Progression sur la dernière session"
                       : trend < 0
-                        ? "L\u00E9g\u00E8re baisse, continuez"
+                        ? "Légère baisse, continuez"
                         : "Niveau stable"
                 }
               />
@@ -276,7 +276,7 @@ export default async function EvaluationPage() {
             <h2 className="text-xl font-semibold text-foreground">Historique</h2>
             {scores.length >= 2 && (
               <div className="inline-flex items-center gap-3 rounded-full border border-foreground/10 bg-white px-3 py-2 shadow-sm">
-                <span className="text-xs font-medium text-foreground/45">\u00C9volution r\u00E9cente</span>
+                <span className="text-xs font-medium text-foreground/45">Évolution récente</span>
                 <Sparkline scores={scores} />
               </div>
             )}
@@ -339,7 +339,7 @@ export default async function EvaluationPage() {
                         })}
                       </span>
                       <span className="flex items-center gap-1 text-xs font-semibold text-primary/30 transition group-hover:text-primary">
-                        Voir le d\u00E9tail
+                        Voir le détail
                         <svg
                           className="h-3.5 w-3.5 translate-x-0 transition-transform group-hover:translate-x-0.5"
                           fill="none"
@@ -379,9 +379,9 @@ export default async function EvaluationPage() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-foreground">Aucune \u00E9valuation termin\u00E9e</h3>
+              <h3 className="text-lg font-semibold text-foreground">Aucune évaluation terminée</h3>
               <p className="mx-auto mt-2 max-w-md text-sm text-foreground/50">
-                Lancez votre premi\u00E8re session pour obtenir un score global et un historique d\u00E9taill\u00E9.
+                Lancez votre première session pour obtenir un score global et un historique détaillé.
               </p>
             </div>
           )}

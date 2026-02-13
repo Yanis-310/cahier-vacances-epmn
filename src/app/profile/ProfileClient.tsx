@@ -73,7 +73,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
 
     if (newPassword && !isNewPasswordValid) {
       setError(
-        "Le mot de passe doit contenir au moins 8 caract\u00E8res, une majuscule et un caract\u00E8re sp\u00E9cial."
+        "Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial."
       );
       return;
     }
@@ -95,7 +95,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Erreur lors de la mise \u00E0 jour.");
+        setError(data.error || "Erreur lors de la mise à jour.");
         setLoading(false);
         return;
       }
@@ -106,7 +106,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setSuccess("Profil mis \u00E0 jour avec succ\u00E8s.");
+      setSuccess("Profil mis à jour avec succès.");
     } catch {
       setError("Erreur de connexion au serveur.");
     }
@@ -132,7 +132,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           </p>
         </div>
 
-        <InfoCard label="Nom" value={name} hint="Affich\u00E9 dans la navigation" />
+        <InfoCard label="Nom" value={name} hint="Affiché dans la navigation" />
         <InfoCard label="Email" value={email} hint="Adresse de connexion" />
 
         <div className="rounded-2xl border border-foreground/8 bg-white p-4 shadow-sm">
@@ -148,7 +148,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
               />
             </svg>
-            Se d\u00E9connecter
+            Se déconnecter
           </button>
         </div>
       </aside>
@@ -168,7 +168,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
 
           <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
             <h2 className="text-lg font-semibold text-foreground">Informations personnelles</h2>
-            <p className="mt-1 text-sm text-foreground/45">Mettez \u00E0 jour vos informations de base.</p>
+            <p className="mt-1 text-sm text-foreground/45">Mettez à jour vos informations de base.</p>
 
             <div className="mt-6 space-y-5">
               <div>
@@ -202,8 +202,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           </div>
 
           <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-lg font-semibold text-foreground">S\u00E9curit\u00E9</h2>
-            <p className="mt-1 text-sm text-foreground/45">Changez votre mot de passe si n\u00E9cessaire.</p>
+            <h2 className="text-lg font-semibold text-foreground">Sécurité</h2>
+            <p className="mt-1 text-sm text-foreground/45">Changez votre mot de passe si nécessaire.</p>
 
             <div className="mt-6 space-y-5">
               <div>
@@ -241,13 +241,13 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                 {newPassword.length > 0 && (
                   <ul className="mt-1.5 space-y-0.5 text-xs">
                     <li className={hasMinLength ? "text-success" : "text-foreground/45"}>
-                      {hasMinLength ? "\u2713" : "\u2717"} 8 caract\u00E8res minimum
+                      {hasMinLength ? "✓" : "✗"} 8 caractères minimum
                     </li>
                     <li className={hasUppercase ? "text-success" : "text-foreground/45"}>
-                      {hasUppercase ? "\u2713" : "\u2717"} Une majuscule
+                      {hasUppercase ? "✓" : "✗"} Une majuscule
                     </li>
                     <li className={hasSpecial ? "text-success" : "text-foreground/45"}>
-                      {hasSpecial ? "\u2713" : "\u2717"} Un caract\u00E8re sp\u00E9cial
+                      {hasSpecial ? "✓" : "✗"} Un caractère spécial
                     </li>
                   </ul>
                 )}

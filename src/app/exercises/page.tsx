@@ -12,7 +12,7 @@ const typeConfig: Record<string, { label: string; bg: string; text: string }> = 
   },
   qcm: { label: "QCM", bg: "bg-primary-pale/70", text: "text-primary" },
   multi_select: {
-    label: "S\u00E9lection multiple",
+    label: "Sélection multiple",
     bg: "bg-primary-pale/70",
     text: "text-primary",
   },
@@ -21,7 +21,7 @@ const typeConfig: Record<string, { label: string; bg: string; text: string }> = 
     bg: "bg-primary-pale/70",
     text: "text-primary",
   },
-  free_text: { label: "R\u00E9daction", bg: "bg-amber-50", text: "text-amber-700" },
+  free_text: { label: "Rédaction", bg: "bg-amber-50", text: "text-amber-700" },
   labyrinth: {
     label: "Labyrinthe",
     bg: "bg-foreground/5",
@@ -31,11 +31,11 @@ const typeConfig: Record<string, { label: string; bg: string; text: string }> = 
 
 function getMotivation(percent: number): string {
   if (percent === 0) return "Commencez votre premier exercice.";
-  if (percent < 25) return "Bon d\u00E9but, continuez sur cette lanc\u00E9e.";
+  if (percent < 25) return "Bon début, continuez sur cette lancée.";
   if (percent < 50) return "Vous avancez bien.";
-  if (percent < 75) return "Plus de la moiti\u00E9, bravo.";
-  if (percent < 100) return "La ligne d'arriv\u00E9e est proche.";
-  return "Parcours compl\u00E9t\u00E9, f\u00E9licitations.";
+  if (percent < 75) return "Plus de la moitié, bravo.";
+  if (percent < 100) return "La ligne d'arrivée est proche.";
+  return "Parcours complété, félicitations.";
 }
 
 function MetricCard({
@@ -103,7 +103,7 @@ export default async function ExercisesPage() {
                     Exercices
                   </h1>
                   <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
-                    R\u00E9visez \u00E0 votre rythme les fondamentaux de la m\u00E9diation professionnelle.
+                    Révisez à votre rythme les fondamentaux de la médiation professionnelle.
                   </p>
                   <p className="mt-2 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
                 </div>
@@ -114,22 +114,22 @@ export default async function ExercisesPage() {
               <MetricCard
                 label="Progression"
                 value={`${progressPercent}%`}
-                hint="Part des exercices termin\u00E9s"
+                hint="Part des exercices terminés"
               />
               <MetricCard
-                label="Termin\u00E9s"
+                label="Terminés"
                 value={`${completedCount}`}
-                hint="Exercices valid\u00E9s"
+                hint="Exercices validés"
               />
               <MetricCard
                 label="En cours"
                 value={`${startedCount}`}
-                hint="Exercices commenc\u00E9s"
+                hint="Exercices commencés"
               />
               <MetricCard
                 label="Restants"
                 value={`${notStartedCount}`}
-                hint="\u00C0 d\u00E9marrer"
+                hint="À démarrer"
               />
             </div>
           </div>
@@ -228,7 +228,7 @@ export default async function ExercisesPage() {
 
         {exercises.length === 0 && (
           <div className="mt-10 rounded-3xl border border-dashed border-foreground/15 bg-white/70 px-6 py-14 text-center shadow-sm">
-            <p className="text-foreground/45">Les exercices seront bient\u00F4t disponibles.</p>
+            <p className="text-foreground/45">Les exercices seront bientôt disponibles.</p>
           </div>
         )}
       </main>
