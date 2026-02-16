@@ -13,16 +13,27 @@ export default async function AdminUsersPage() {
     redirect("/admin");
   }
 
-  const users = await prisma.user.findMany({
-    orderBy: [{ role: "asc" }, { createdAt: "desc" }],
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-    },
-  });
+  const now = new Date();
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [users, adminCount, newThisMonth] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: [{ role: "asc" }, { createdAt: "desc" }],
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    }),
+    prisma.user.count({
+      where: { role: { in: ["ADMIN", "OWNER"] } },
+    }),
+    prisma.user.count({
+      where: { createdAt: { gte: firstOfMonth } },
+    }),
+  ]);
 
   return (
     <AdminUsersClient
@@ -30,6 +41,11 @@ export default async function AdminUsersPage() {
         ...user,
         createdAt: user.createdAt.toISOString(),
       }))}
+      stats={{
+        total: users.length,
+        admins: adminCount,
+        newThisMonth,
+      }}
     />
   );
 }
