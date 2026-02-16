@@ -8,6 +8,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = "epmn_install_dismissed";
+const SHOWN_ONCE_KEY = "epmn_install_prompt_shown_once";
 
 export default function InstallPrompt() {
   const [show, setShow] = useState(false);
@@ -16,19 +17,36 @@ export default function InstallPrompt() {
     const ua = navigator.userAgent;
     return /iPad|iPhone|iPod/.test(ua) && !(window as unknown as { MSStream?: unknown }).MSStream;
   });
+  const [isPhone] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const ua = navigator.userAgent;
+    return /iPhone|iPod|Android.*Mobile|Windows Phone|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      ua
+    );
+  });
   const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
+  function showPromptOnce() {
+    if (localStorage.getItem(SHOWN_ONCE_KEY)) return;
+    localStorage.setItem(SHOWN_ONCE_KEY, "1");
+    setShow(true);
+  }
+
   useEffect(() => {
+    // Only show on phones
+    if (!isPhone) return;
     // Don't show if already installed (standalone mode)
     if (window.matchMedia("(display-mode: standalone)").matches) return;
     // Don't show if already in a webview / TWA
     if ((navigator as unknown as { standalone?: boolean }).standalone) return;
     // Don't show if user already dismissed
     if (localStorage.getItem(DISMISS_KEY)) return;
+    // Don't show if prompt was already shown once
+    if (localStorage.getItem(SHOWN_ONCE_KEY)) return;
 
     if (isIOS) {
       // Small delay so it doesn't flash immediately on load
-      const t = setTimeout(() => setShow(true), 2000);
+      const t = setTimeout(() => showPromptOnce(), 2000);
       return () => clearTimeout(t);
     }
 
@@ -36,12 +54,12 @@ export default function InstallPrompt() {
     function handleBeforeInstall(e: Event) {
       e.preventDefault();
       deferredPromptRef.current = e as BeforeInstallPromptEvent;
-      setTimeout(() => setShow(true), 2000);
+      setTimeout(() => showPromptOnce(), 2000);
     }
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
-  }, [isIOS]);
+  }, [isIOS, isPhone]);
 
   function dismiss() {
     setShow(false);
