@@ -57,13 +57,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.role = (token.role as UserRole | undefined) ?? "USER";
       return session;
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
         token.role = user.role;
       }
-      // Re-fetch from DB on session update to prevent client-side token manipulation
-      if ((trigger === "update" || !token.role) && token.sub) {
+      // Always re-fetch role from DB so admin role changes take effect immediately
+      if (token.sub) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
           select: { name: true, email: true, role: true },
