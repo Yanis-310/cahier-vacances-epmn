@@ -1,9 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { isOwnerRole } from "@/lib/access-control";
 import { prisma } from "@/lib/prisma";
-import Navbar from "@/components/Navbar";
 import AdminUsersClient from "./AdminUsersClient";
 
 export default async function AdminUsersPage() {
@@ -27,22 +25,11 @@ export default async function AdminUsersPage() {
   });
 
   return (
-    <>
-      <Navbar />
-      <main className="max-w-6xl mx-auto px-4 py-10 space-y-4">
-        <Link
-          href="/admin"
-          className="inline-flex items-center rounded-lg border border-foreground/20 px-3 py-2 text-sm hover:bg-foreground/5"
-        >
-          Retour admin exercices
-        </Link>
-        <AdminUsersClient
-          initialUsers={users.map((user) => ({
-            ...user,
-            createdAt: user.createdAt.toISOString(),
-          }))}
-        />
-      </main>
-    </>
+    <AdminUsersClient
+      initialUsers={users.map((user) => ({
+        ...user,
+        createdAt: user.createdAt.toISOString(),
+      }))}
+    />
   );
 }

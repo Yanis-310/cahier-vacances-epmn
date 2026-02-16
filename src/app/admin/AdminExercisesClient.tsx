@@ -130,8 +130,10 @@ function defaultQuestion(): DraftQuestion {
 
 export default function AdminExercisesClient({
   initialExercises,
+  stats,
 }: {
   initialExercises: AdminExercise[];
+  stats: { total: number; active: number; inactive: number };
 }) {
   const [exercises, setExercises] = useState(initialExercises);
   const [loading, setLoading] = useState(false);
@@ -951,6 +953,46 @@ export default function AdminExercisesClient({
          *  LIST VIEW (default)
          * ================================================================ */
         <>
+          {/* ---- Stats cards ---- */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="flex items-center gap-4 rounded-2xl border bg-white p-5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1" />
+                  <rect x="14" y="3" width="7" height="7" rx="1" />
+                  <rect x="3" y="14" width="7" height="7" rx="1" />
+                  <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{stats.total}</div>
+                <div className="text-sm text-foreground/50">Total exercices</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 rounded-2xl border bg-white p-5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-success/10 text-success">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{stats.active}</div>
+                <div className="text-sm text-foreground/50">Actifs</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 rounded-2xl border bg-white p-5">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-warning/10 text-warning">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{stats.inactive}</div>
+                <div className="text-sm text-foreground/50">Masqués</div>
+              </div>
+            </div>
+          </div>
+
           {/* ---- Header with create button ---- */}
           <section className="flex flex-col gap-4 rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
