@@ -139,3 +139,35 @@ export async function POST(
     return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await requireAdmin();
+    const { id } = await params;
+
+    const existing = await prisma.exercise.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      return NextResponse.json({ error: "Exercice introuvable." }, { status: 404 });
+    }
+
+    await prisma.exercise.delete({ where: { id } });
+
+    revalidatePath("/exercises");
+    revalidatePath("/evaluation");
+    revalidatePath("/admin");
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    if (error instanceof AuthorizationError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
+  }
+}

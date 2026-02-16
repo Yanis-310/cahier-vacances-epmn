@@ -293,6 +293,33 @@ export default function AdminExercisesClient({
     }
   }
 
+  async function deleteExercise(exercise: AdminExercise) {
+    const confirmed = window.confirm(
+      `Supprimer l'exercice #${exercise.number} - ${exercise.title} ? Cette action est irreversible.`
+    );
+    if (!confirmed) return;
+
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/exercises/${exercise.id}`, {
+        method: "DELETE",
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(data.error ?? "Suppression impossible.");
+      await refresh();
+      if (editingId === exercise.id) {
+        resetForm();
+      }
+      setSuccess("Exercice supprime.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erreur.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm">
@@ -376,6 +403,7 @@ export default function AdminExercisesClient({
                 <button type="button" onClick={() => startEditing(exercise)} className="rounded border px-3 py-2 text-sm">Modifier</button>
                 <button type="button" onClick={() => duplicateExercise(exercise)} className="rounded border px-3 py-2 text-sm">Dupliquer</button>
                 <button type="button" onClick={() => toggleVisibility(exercise)} className="rounded border px-3 py-2 text-sm">{exercise.isActive ? "Masquer" : "Reactiver"}</button>
+                <button type="button" onClick={() => deleteExercise(exercise)} className="rounded border border-red-300 px-3 py-2 text-sm text-red-700 hover:bg-red-50">Supprimer</button>
               </div>
             </article>
           ))}
