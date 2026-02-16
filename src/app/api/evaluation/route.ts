@@ -11,7 +11,10 @@ export async function POST() {
   try {
     // Get all auto-gradable exercises (exclude free_text and labyrinth)
     const exercises = await prisma.exercise.findMany({
-      where: { type: { notIn: ["free_text", "labyrinth"] } },
+      where: {
+        isActive: true,
+        type: { notIn: ["free_text", "labyrinth"] },
+      },
       select: { id: true, content: true, type: true },
     });
 

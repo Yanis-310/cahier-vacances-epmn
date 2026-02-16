@@ -1,3 +1,5 @@
+import type { UserRole } from "@prisma/client";
+
 interface CredentialsLike {
   email?: unknown;
   password?: unknown;
@@ -7,6 +9,7 @@ interface UserRecord {
   id: string;
   name: string;
   email: string;
+  role: UserRole;
   passwordHash: string;
 }
 
@@ -31,5 +34,5 @@ export async function authorizeCredentials(
 
   if (!isValid) return null;
 
-  return { id: user.id, name: user.name, email: user.email };
+  return { id: user.id, name: user.name, email: user.email, role: user.role };
 }

@@ -14,7 +14,9 @@ export default async function ExercisePage({
 
   const { id } = await params;
 
-  const exercise = await prisma.exercise.findUnique({ where: { id } });
+  const exercise = await prisma.exercise.findFirst({
+    where: { id, isActive: true },
+  });
   if (!exercise) notFound();
 
   const progress = await prisma.userProgress.findUnique({
@@ -28,6 +30,7 @@ export default async function ExercisePage({
 
   // Get prev/next exercise IDs for navigation
   const allExercises = await prisma.exercise.findMany({
+    where: { isActive: true },
     orderBy: { number: "asc" },
     select: { id: true, number: true },
   });

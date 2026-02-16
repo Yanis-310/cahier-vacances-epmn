@@ -67,6 +67,7 @@ export default async function ExercisesPage() {
 
   const [exercises, progress] = await Promise.all([
     prisma.exercise.findMany({
+      where: { isActive: true },
       orderBy: { number: "asc" },
       select: { id: true, number: true, title: true, type: true },
     }),

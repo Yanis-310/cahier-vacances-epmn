@@ -12,10 +12,17 @@ model User {
   name         String
   email        String         @unique
   passwordHash String
+  role         UserRole       @default(USER)
   createdAt    DateTime       @default(now())
   progress     UserProgress[]
   evaluations  Evaluation[]
   resetTokens  PasswordResetToken[]
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  USER
 }
 
 enum ExerciseType {
@@ -32,6 +39,7 @@ model Exercise {
   number   Int            @unique
   title    String
   type     ExerciseType
+  isActive Boolean        @default(true)
   content  Json
   answers  Json
   progress UserProgress[]

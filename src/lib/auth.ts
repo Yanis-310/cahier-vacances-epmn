@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/auth-credentials";
 
@@ -19,7 +20,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           findUserByEmail: (email) =>
             prisma.user.findUnique({
               where: { email },
-              select: { id: true, name: true, email: true, passwordHash: true },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                passwordHash: true,
+              },
             }),
           comparePassword: bcrypt.compare,
         });
@@ -47,21 +54,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       if (token.name) session.user.name = token.name;
       if (token.email) session.user.email = token.email;
+      session.user.role = (token.role as UserRole | undefined) ?? "USER";
       return session;
     },
     async jwt({ token, user, trigger }) {
       if (user) {
         token.sub = user.id;
+        token.role = user.role;
       }
       // Re-fetch from DB on session update to prevent client-side token manipulation
-      if (trigger === "update" && token.sub) {
+      if ((trigger === "update" || !token.role) && token.sub) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
-          select: { name: true, email: true },
+          select: { name: true, email: true, role: true },
         });
         if (dbUser) {
           token.name = dbUser.name;
           token.email = dbUser.email;
+          token.role = dbUser.role;
         }
       }
       return token;

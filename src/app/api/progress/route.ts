@@ -20,8 +20,8 @@ export async function POST(request: Request) {
 
   const result = await handleProgressUpdate(body, session.user.id, {
     findExercise: (exerciseId) =>
-      prisma.exercise.findUnique({
-        where: { id: exerciseId },
+      prisma.exercise.findFirst({
+        where: { id: exerciseId, isActive: true },
         select: { answers: true },
       }),
     findExistingProgress: (userId, exerciseId) =>

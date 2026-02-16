@@ -30,6 +30,7 @@ test("authorizeCredentials returns null when password is invalid", async () => {
         id: "u1",
         name: "Alice",
         email: "a@a.com",
+        role: "USER",
         passwordHash: "hash",
       }),
       comparePassword: async () => false,
@@ -47,6 +48,7 @@ test("authorizeCredentials returns user payload when credentials are valid", asy
         id: "u1",
         name: "Alice",
         email: "a@a.com",
+        role: "USER",
         passwordHash: "hash",
       }),
       comparePassword: async () => true,
@@ -57,5 +59,6 @@ test("authorizeCredentials returns user payload when credentials are valid", asy
     id: "u1",
     name: "Alice",
     email: "a@a.com",
+    role: "USER",
   });
 });

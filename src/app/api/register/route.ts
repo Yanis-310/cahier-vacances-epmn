@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { handleRegister } from "@/lib/api-register";
 import {
@@ -14,6 +15,14 @@ const REGISTER_RATE_LIMIT = getRateLimitOptionsFromEnv("REGISTER_RATE_LIMIT", {
   max: 5,
   windowMs: 10 * 60 * 1000,
 });
+const OWNER_EMAIL = process.env.OWNER_EMAIL?.trim().toLowerCase();
+
+function roleForNewUser(email: string): UserRole {
+  if (OWNER_EMAIL && email === OWNER_EMAIL) {
+    return "OWNER";
+  }
+  return "USER";
+}
 
 export async function POST(request: Request) {
   const rateKey = getClientIp(request);
@@ -41,7 +50,12 @@ export async function POST(request: Request) {
   const result = await handleRegister(body, {
     hashPassword: (password) => bcrypt.hash(password, 10),
     createUser: async (data) => {
-      await prisma.user.create({ data });
+      await prisma.user.create({
+        data: {
+          ...data,
+          role: roleForNewUser(data.email),
+        },
+      });
     },
   });
 
