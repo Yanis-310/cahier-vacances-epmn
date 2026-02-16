@@ -3,12 +3,42 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { z } from "zod";
+import {
+  getClientIp,
+  getRateLimitOptionsFromEnv,
+  limitRate,
+  logRateLimitExceeded,
+  retryAfterSeconds,
+} from "@/lib/rate-limit";
 
 const schema = z.object({
   email: z.string().email(),
 });
 
+const FORGOT_PASSWORD_RATE_LIMIT = getRateLimitOptionsFromEnv(
+  "FORGOT_PASSWORD_RATE_LIMIT",
+  {
+    max: 5,
+    windowMs: 15 * 60 * 1000,
+  }
+);
+
 export async function POST(request: Request) {
+  const rateKey = getClientIp(request);
+  const rate = limitRate("forgot-password", rateKey, FORGOT_PASSWORD_RATE_LIMIT);
+  if (!rate.allowed) {
+    logRateLimitExceeded("forgot-password", rateKey, rate.resetAt);
+    return NextResponse.json(
+      { error: "Trop de demandes. Réessayez plus tard." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(retryAfterSeconds(rate.resetAt)),
+        },
+      }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
