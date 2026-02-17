@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type ExerciseType =
   | "single_choice"
@@ -139,6 +139,7 @@ export default function AdminExercisesClient({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [successVariant, setSuccessVariant] = useState<"green" | "red" | "orange" | "blue">("green");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const [number, setNumber] = useState("");
@@ -155,6 +156,17 @@ export default function AdminExercisesClient({
   const [page, setPage] = useState(1);
   const [showContext, setShowContext] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const successRef = useRef<HTMLDivElement>(null);
+  const successTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+  /* Auto-dismiss success after 6s and scroll to it */
+  useEffect(() => {
+    if (!success) return;
+    successRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    successTimerRef.current = setTimeout(() => setSuccess(null), 6000);
+    return () => { if (successTimerRef.current) clearTimeout(successTimerRef.current); };
+  }, [success]);
 
   const PER_PAGE = 10;
 
@@ -419,7 +431,13 @@ export default function AdminExercisesClient({
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? "Enregistrement impossible.");
       await refresh();
-      setSuccess(editingId ? "Exercice mis a jour." : "Exercice cree.");
+      const label = title.trim() ? `« ${title.trim()} »` : `#${number}`;
+      setSuccessVariant("green");
+      setSuccess(
+        editingId
+          ? `Exercice ${label} mis à jour avec succès !`
+          : `Nouvel exercice ${label} créé avec succès !`
+      );
       resetForm();
       setShowForm(false);
     } catch (e) {
@@ -457,7 +475,8 @@ export default function AdminExercisesClient({
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? "Duplication impossible.");
       await refresh();
-      setSuccess("Exercice duplique.");
+      setSuccessVariant("blue");
+      setSuccess(`Exercice #${exercise.number} « ${exercise.title} » dupliqué avec succès !`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur.");
     } finally {
@@ -478,7 +497,8 @@ export default function AdminExercisesClient({
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? "Mise a jour impossible.");
       await refresh();
-      setSuccess(exercise.isActive ? "Exercice masque." : "Exercice reactive.");
+      setSuccessVariant(exercise.isActive ? "orange" : "green");
+      setSuccess(exercise.isActive ? `Exercice « ${exercise.title} » masqué.` : `Exercice « ${exercise.title} » réactivé !`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur.");
     } finally {
@@ -503,7 +523,8 @@ export default function AdminExercisesClient({
       if (!response.ok) throw new Error(data.error ?? "Suppression impossible.");
       await refresh();
       if (editingId === exercise.id) resetForm();
-      setSuccess("Exercice supprime.");
+      setSuccessVariant("red");
+      setSuccess(`Exercice #${exercise.number} « ${exercise.title} » supprimé.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erreur.");
     } finally {
@@ -521,11 +542,68 @@ export default function AdminExercisesClient({
           {error}
         </div>
       )}
-      {success && (
-        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-          {success}
-        </div>
-      )}
+      {success && (() => {
+        const v = successVariant;
+        const borderClass = v === "red" ? "border-red-300 bg-gradient-to-r from-red-50 to-rose-50"
+          : v === "orange" ? "border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50"
+          : v === "blue" ? "border-blue-300 bg-gradient-to-r from-blue-50 to-indigo-50"
+          : "border-green-300 bg-gradient-to-r from-green-50 to-emerald-50";
+        const iconBg = v === "red" ? "bg-red-500" : v === "orange" ? "bg-amber-500" : v === "blue" ? "bg-blue-500" : "bg-green-500";
+        const textMain = v === "red" ? "text-red-800" : v === "orange" ? "text-amber-800" : v === "blue" ? "text-blue-800" : "text-green-800";
+        const textSub = v === "red" ? "text-red-600" : v === "orange" ? "text-amber-600" : v === "blue" ? "text-blue-600" : "text-green-600";
+        const btnClass = v === "red" ? "text-red-400 hover:bg-red-100 hover:text-red-600"
+          : v === "orange" ? "text-amber-400 hover:bg-amber-100 hover:text-amber-600"
+          : v === "blue" ? "text-blue-400 hover:bg-blue-100 hover:text-blue-600"
+          : "text-green-400 hover:bg-green-100 hover:text-green-600";
+        const subtitle = v === "red"
+          ? "L'exercice a été définitivement supprimé."
+          : v === "orange"
+            ? "L'exercice n'est plus visible pour les apprenants."
+            : v === "blue"
+              ? "Une copie identique a été ajoutée à la liste."
+              : "Les modifications sont enregistrées et disponibles immédiatement.";
+        return (
+          <div
+            ref={successRef}
+            className={`animate-[slideDown_0.35s_ease-out] rounded-2xl border-2 px-6 py-5 shadow-lg ${borderClass}`}
+          >
+            <div className="flex items-center gap-4">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white shadow-sm ${iconBg}`}>
+                {v === "red" ? (
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21A48.108 48.108 0 0015.75 5.79m-12 .562a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
+                ) : v === "orange" ? (
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                ) : v === "blue" ? (
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m0 0a2.625 2.625 0 115.25 0H15" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className={`text-base font-bold ${textMain}`}>{success}</p>
+                <p className={`mt-0.5 text-sm ${textSub}`}>{subtitle}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSuccess(null)}
+                className={`shrink-0 rounded-lg p-1.5 transition-colors ${btnClass}`}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {showForm ? (
         /* ================================================================
@@ -994,6 +1072,29 @@ export default function AdminExercisesClient({
             </button>
           </div>
 
+          {/* ---- Stats cards ---- */}
+          {(() => {
+            const total = exercises.length;
+            const active = exercises.filter((e) => e.isActive).length;
+            const inactive = total - active;
+            return (
+              <div className="grid grid-cols-3 gap-4">
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Total</p>
+                  <p className="mt-1 text-2xl font-bold text-slate-900">{total}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-green-500">Actifs</p>
+                  <p className="mt-1 text-2xl font-bold text-green-600">{active}</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Masqués</p>
+                  <p className="mt-1 text-2xl font-bold text-slate-400">{inactive}</p>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* ---- Filter bar ---- */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1 sm:max-w-md">
@@ -1010,7 +1111,10 @@ export default function AdminExercisesClient({
             <div className="flex flex-wrap items-center gap-2">
               {([
                 { value: "all" as const, label: "Tous" },
+                { value: "single_choice" as const, label: "Choix unique" },
                 { value: "qcm" as const, label: "QCM" },
+                { value: "multi_select" as const, label: "Sélection multiple" },
+                { value: "true_false" as const, label: "Vrai / Faux" },
                 { value: "free_text" as const, label: "Rédac" },
                 { value: "labyrinth" as const, label: "Labyrinthe" },
               ] as const).map((f) => (
