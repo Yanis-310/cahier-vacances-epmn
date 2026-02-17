@@ -172,14 +172,14 @@ export default async function EvaluationPage() {
   const bestEvalId =
     completed.length > 1
       ? completed.reduce((best, ev) => {
-          const evPct =
-            ev.total > 0 ? Math.round(((ev.score ?? 0) / ev.total) * 100) : 0;
-          const bestPct =
-            best.total > 0
-              ? Math.round(((best.score ?? 0) / best.total) * 100)
-              : 0;
-          return evPct > bestPct ? ev : best;
-        }).id
+        const evPct =
+          ev.total > 0 ? Math.round(((ev.score ?? 0) / ev.total) * 100) : 0;
+        const bestPct =
+          best.total > 0
+            ? Math.round(((best.score ?? 0) / best.total) * 100)
+            : 0;
+        return evPct > bestPct ? ev : best;
+      }).id
       : null;
 
   return (
@@ -272,14 +272,8 @@ export default async function EvaluationPage() {
         </section>
 
         <section className="mt-10">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="mb-5">
             <h2 className="text-xl font-semibold text-foreground">Historique</h2>
-            {scores.length >= 2 && (
-              <div className="inline-flex items-center gap-3 rounded-full border border-foreground/10 bg-white px-3 py-2 shadow-sm">
-                <span className="text-xs font-medium text-foreground/45">Évolution récente</span>
-                <Sparkline scores={scores} />
-              </div>
-            )}
           </div>
 
           {completed.length > 0 && (
@@ -299,11 +293,10 @@ export default async function EvaluationPage() {
                   <Link
                     key={ev.id}
                     href={`/evaluation/${ev.id}/result`}
-                    className={`grid-card-enter group relative flex min-h-[174px] flex-col rounded-2xl border border-foreground/8 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg ${
-                      isBest
+                    className={`grid-card-enter group relative flex min-h-[174px] flex-col rounded-2xl border border-foreground/8 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg ${isBest
                         ? "bg-gradient-to-br from-white to-amber-50/60 ring-1 ring-amber-200/80"
                         : "shadow-sm"
-                    }`}
+                      }`}
                     style={{ animationDelay: `${index * 0.04}s` }}
                   >
                     <div className="mb-4 flex items-start justify-between">
