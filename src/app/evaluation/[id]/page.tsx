@@ -71,7 +71,7 @@ export default async function EvaluationTakePage({
         <EvaluationClient
           evaluationId={evaluation.id}
           questions={questions}
-          total={evaluation.total}
+          total={questions.length}
         />
       </main>
     </>

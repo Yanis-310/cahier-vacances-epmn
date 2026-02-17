@@ -2,6 +2,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import ClientGreeting from "@/components/ClientGreeting";
 
 export default async function Home() {
   const session = await auth();
@@ -37,9 +38,6 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
 
   const progressPercent = exerciseCount > 0 ? Math.round((completedCount / exerciseCount) * 100) : 0;
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Bonjour" : hour < 18 ? "Bon après-midi" : "Bonsoir";
-
   return (
     <>
       <Navbar />
@@ -47,9 +45,7 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
         {/* Hero — mirrors Landing structure */}
         <section className="hero-landing">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 sm:pt-32 sm:pb-40 text-center">
-            <p className="text-foreground/40 text-sm font-medium tracking-widest uppercase mb-4">
-              {greeting}
-            </p>
+            <ClientGreeting />
             <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">
               {userName}
             </h1>
@@ -229,7 +225,7 @@ function Landing() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Mode évaluation</h3>
               <p className="text-foreground/60">
-                Testez-vous avec des évaluations aléatoires de 20 à 25
+                Testez-vous avec des évaluations aléatoires de 20
                 questions et suivez votre progression.
               </p>
             </div>

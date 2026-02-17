@@ -51,22 +51,6 @@ export default async function EvaluationResultPage({
   const exerciseMap = new Map(exercises.map((e) => [e.id, e]));
   const userAnswers = evaluation.userAnswers as Record<string, string>;
 
-  const score = evaluation.score ?? 0;
-  const total = evaluation.total;
-  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
-  const incorrect = total - score;
-
-  const scoreColor =
-    pct >= 75 ? "text-success" : pct >= 50 ? "text-warning" : "text-error";
-  const scoreBgRing =
-    pct >= 75
-      ? "text-success/15"
-      : pct >= 50
-        ? "text-warning/15"
-        : "text-error/15";
-
-  const circumference = 2 * Math.PI * 54;
-
   // Build detailed results
   const details = questionIds
     .filter((qRef) => exerciseMap.has(qRef.exerciseId))
@@ -114,6 +98,23 @@ export default async function EvaluationResultPage({
       isCorrect,
     };
   });
+
+  // Score computed from actual details (resilient to deleted exercises)
+  const score = details.filter((d) => d.isCorrect).length;
+  const total = details.length;
+  const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+  const incorrect = total - score;
+
+  const scoreColor =
+    pct >= 75 ? "text-success" : pct >= 50 ? "text-warning" : "text-error";
+  const scoreBgRing =
+    pct >= 75
+      ? "text-success/15"
+      : pct >= 50
+        ? "text-warning/15"
+        : "text-error/15";
+
+  const circumference = 2 * Math.PI * 54;
 
   // Breakdown by exercise type
   const typeBreakdown = new Map<
