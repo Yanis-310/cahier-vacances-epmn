@@ -19,11 +19,11 @@ export default function Navbar() {
 
   const initials = session?.user?.name
     ? session.user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : "?";
 
   return (
@@ -31,7 +31,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">EPMN</span>
+            <span className="text-xl font-bold" style={{ color: '#F2C073' }}>EPMN</span>
             <span className="hidden sm:inline text-sm text-foreground/60">
               Cahier de Vacances
             </span>
@@ -42,32 +42,29 @@ export default function Navbar() {
               <>
                 <Link
                   href="/exercises"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive("/exercises")
-                      ? "text-primary bg-primary-pale/50"
-                      : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/exercises")
+                    ? "text-primary bg-primary-pale/50"
+                    : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
+                    }`}
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive("/evaluation")
-                      ? "text-primary bg-primary-pale/50"
-                      : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/evaluation")
+                    ? "text-primary bg-primary-pale/50"
+                    : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
+                    }`}
                 >
                   Evaluation
                 </Link>
                 {canAccessAdmin && (
                   <Link
                     href="/admin"
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive("/admin")
-                        ? "text-primary bg-primary-pale/50"
-                        : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
-                    }`}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive("/admin")
+                      ? "text-primary bg-primary-pale/50"
+                      : "text-foreground/70 hover:text-primary hover:bg-primary-pale/50"
+                      }`}
                   >
                     Admin
                   </Link>
@@ -79,7 +76,7 @@ export default function Navbar() {
                   href="/profile"
                   className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-foreground/5 transition-colors cursor-pointer"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F2C073' }}>
                     <span className="text-white text-xs font-semibold leading-none">
                       {initials}
                     </span>
@@ -99,7 +96,8 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="ml-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-light transition-colors"
+                  className="ml-2 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#F2C073' }}
                 >
                   Creer un compte
                 </Link>
@@ -137,7 +135,7 @@ export default function Navbar() {
             {session ? (
               <>
                 <div className="flex items-center gap-3 px-3 py-3 mb-1 border-b border-foreground/5">
-                  <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F2C073' }}>
                     <span className="text-white text-sm font-semibold leading-none">
                       {initials}
                     </span>
@@ -151,33 +149,30 @@ export default function Navbar() {
                 <Link
                   href="/exercises"
                   onClick={() => setMenuOpen(false)}
-                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive("/exercises")
-                      ? "text-primary bg-primary-pale/50 font-medium"
-                      : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
-                  }`}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/exercises")
+                    ? "text-primary bg-primary-pale/50 font-medium"
+                    : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
+                    }`}
                 >
                   Exercices
                 </Link>
                 <Link
                   href="/evaluation"
                   onClick={() => setMenuOpen(false)}
-                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive("/evaluation")
-                      ? "text-primary bg-primary-pale/50 font-medium"
-                      : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
-                  }`}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/evaluation")
+                    ? "text-primary bg-primary-pale/50 font-medium"
+                    : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
+                    }`}
                 >
                   Evaluation
                 </Link>
                 <Link
                   href="/profile"
                   onClick={() => setMenuOpen(false)}
-                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                    isActive("/profile")
-                      ? "text-primary bg-primary-pale/50 font-medium"
-                      : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
-                  }`}
+                  className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/profile")
+                    ? "text-primary bg-primary-pale/50 font-medium"
+                    : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
+                    }`}
                 >
                   Mon profil
                 </Link>
@@ -185,11 +180,10 @@ export default function Navbar() {
                   <Link
                     href="/admin"
                     onClick={() => setMenuOpen(false)}
-                    className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${
-                      isActive("/admin")
-                        ? "text-primary bg-primary-pale/50 font-medium"
-                        : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
-                    }`}
+                    className={`block px-3 py-2.5 rounded-lg text-sm transition-colors ${isActive("/admin")
+                      ? "text-primary bg-primary-pale/50 font-medium"
+                      : "text-foreground/70 hover:bg-primary-pale hover:text-primary"
+                      }`}
                   >
                     Admin
                   </Link>
@@ -208,7 +202,8 @@ export default function Navbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-3 py-2.5 rounded-lg bg-primary text-white text-center text-sm hover:bg-primary-light transition-colors"
+                  className="block px-3 py-2.5 rounded-lg text-white text-center text-sm transition-colors hover:opacity-90"
+                  style={{ backgroundColor: '#F2C073' }}
                 >
                   Creer un compte
                 </Link>

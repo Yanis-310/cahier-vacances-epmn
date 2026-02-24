@@ -4,28 +4,24 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
-const typeConfig: Record<string, { label: string; bg: string; text: string }> = {
+const typeConfig: Record<string, { label: string; color: string }> = {
   single_choice: {
-    label: "Choix unique",
-    bg: "bg-primary-pale/70",
-    text: "text-primary",
+    label: "choix unique",
+    color: "#F2C073",
   },
-  qcm: { label: "QCM", bg: "bg-primary-pale/70", text: "text-primary" },
+  qcm: { label: "QCM", color: "#F2C073" },
   multi_select: {
-    label: "Sélection multiple",
-    bg: "bg-primary-pale/70",
-    text: "text-primary",
+    label: "sélection multiple",
+    color: "#F2C073",
   },
   true_false: {
-    label: "Vrai / Faux",
-    bg: "bg-primary-pale/70",
-    text: "text-primary",
+    label: "vrai / faux",
+    color: "#F2C073",
   },
-  free_text: { label: "Rédaction", bg: "bg-amber-50", text: "text-amber-700" },
+  free_text: { label: "rédaction", color: "#F2C073" },
   labyrinth: {
-    label: "Labyrinthe",
-    bg: "bg-foreground/5",
-    text: "text-foreground/60",
+    label: "labyrinthe",
+    color: "#F2C073",
   },
 };
 
@@ -38,22 +34,41 @@ function getMotivation(percent: number): string {
   return "Parcours complété, félicitations.";
 }
 
+const metricCards = [
+  { icon: "/icons/solar/soleil2 1.png", bg: "rgba(252, 219, 80, 0.73)" },
+  { icon: "/icons/solar/sablepelle 1.png", bg: "rgba(242, 193, 116, 0.77)" },
+  { icon: "/icons/solar/ballon 4.png", bg: "rgba(255, 152, 120, 0.67)" },
+  { icon: "/icons/solar/tongue2 1.png", bg: "rgba(30, 207, 207, 0.46)" },
+];
+
 function MetricCard({
   label,
   value,
   hint,
+  icon,
+  bg,
 }: {
   label: string;
   value: string;
   hint?: string;
+  icon: string;
+  bg: string;
 }) {
   return (
-    <div className="rounded-xl border border-foreground/8 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/35">
+    <div
+      className="rounded-xl p-5 relative overflow-hidden"
+      style={{ backgroundColor: bg }}
+    >
+      <img
+        src={icon}
+        alt=""
+        className="absolute top-3 right-3 w-12 h-12 object-contain pointer-events-none"
+      />
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/60">
         {label}
       </p>
       <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
-      {hint && <p className="mt-1 text-sm text-foreground/45">{hint}</p>}
+      {hint && <p className="mt-1 text-sm text-foreground/60">{hint}</p>}
     </div>
   );
 }
@@ -87,93 +102,144 @@ export default async function ExercisesPage() {
       ? Math.round((completedCount / exercises.length) * 100)
       : 0;
 
+  const metricData = [
+    { label: "Progression", value: `${progressPercent}%`, hint: "Part des exercices terminés" },
+    { label: "Terminés", value: `${completedCount}`, hint: "Exercices validés" },
+    { label: "En cours", value: `${startedCount}`, hint: "Exercices commencés" },
+    { label: "Restants", value: `${notStartedCount}`, hint: "À démarrer" },
+  ];
+
   return (
     <>
       <Navbar />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <section className="overflow-hidden rounded-2xl border border-foreground/8 bg-white shadow-sm">
-          <div className="h-1.5 w-full bg-primary/80" />
-          <div className="bg-primary-pale/25 p-6 sm:p-8">
-            <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-5">
-                <div>
-                  <p className="inline-flex items-center rounded-full border border-primary/20 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                    Session de niveau
-                  </p>
-                  <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                    Exercices
-                  </h1>
-                  <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
-                    Révisez à votre rythme les fondamentaux de la médiation professionnelle.
-                  </p>
-                  <p className="mt-2 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
+      <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#FCF4E8' }}>
+        {/* Decorative palm tree — right side, near card bottom */}
+        <img
+          src="/icons/solar/palmiersurf 1.png"
+          alt=""
+          className="hidden lg:block absolute pointer-events-none z-0"
+          style={{ top: '280px', right: '0px', width: '220px' }}
+        />
+        {/* Decorative palm tree — bottom right */}
+        <img
+          src="/icons/solar/palmiersurf 1.png"
+          alt=""
+          className="hidden lg:block absolute bottom-0 right-0 w-44 pointer-events-none z-0"
+          style={{ transform: 'scaleX(-1)' }}
+        />
+        {/* Decorative palm tree — bottom left */}
+        <img
+          src="/icons/solar/palmiersurf 1.png"
+          alt=""
+          className="hidden lg:block absolute bottom-0 left-0 w-40 pointer-events-none z-0"
+        />
+
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+          {/* Section wrapper for hibiscus overflow */}
+          <div className="relative">
+            {/* Decorative hibiscus — centered on top-right corner of the card */}
+            <img
+              src="/icons/solar/fleur 1.png"
+              alt=""
+              className="absolute object-contain pointer-events-none z-30"
+              style={{ top: '-70px', right: '-50px', width: '180px', height: '180px' }}
+            />
+
+            <section className="rounded-2xl border-2 bg-white shadow-sm relative overflow-hidden" style={{ borderColor: '#F2C073' }}>
+              <div className="p-6 sm:p-8">
+                <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-5">
+                    <div>
+                      <p className="inline-flex items-center rounded-full border bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]" style={{ borderColor: '#F2C073', color: '#333' }}>
+                        Session de niveau
+                      </p>
+                      <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: '#F2C073' }}>
+                        Exercices
+                      </h1>
+                      <p className="mt-3 text-base leading-relaxed text-foreground/60 sm:text-lg">
+                        Révisez à votre rythme les fondamentaux de la médiation professionnelle.
+                      </p>
+                      <p className="mt-2 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {metricData.map((m, i) => (
+                    <MetricCard
+                      key={m.label}
+                      label={m.label}
+                      value={m.value}
+                      hint={m.hint}
+                      icon={metricCards[i].icon}
+                      bg={metricCards[i].bg}
+                    />
+                  ))}
                 </div>
               </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <MetricCard
-                label="Progression"
-                value={`${progressPercent}%`}
-                hint="Part des exercices terminés"
-              />
-              <MetricCard
-                label="Terminés"
-                value={`${completedCount}`}
-                hint="Exercices validés"
-              />
-              <MetricCard
-                label="En cours"
-                value={`${startedCount}`}
-                hint="Exercices commencés"
-              />
-              <MetricCard
-                label="Restants"
-                value={`${notStartedCount}`}
-                hint="À démarrer"
-              />
-            </div>
+            </section>
           </div>
-        </section>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {exercises.map((exercise, index) => {
-            const status = progressMap.get(exercise.id);
-            const isCompleted = status === true;
-            const isStarted = status !== undefined && !isCompleted;
-            const type = typeConfig[exercise.type] || {
-              label: exercise.type,
-              bg: "bg-gray-50",
-              text: "text-gray-500",
-            };
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {exercises.map((exercise, index) => {
+              const status = progressMap.get(exercise.id);
+              const isCompleted = status === true;
+              const isStarted = status !== undefined && !isCompleted;
+              const type = typeConfig[exercise.type] || {
+                label: exercise.type,
+                color: "#F2C073",
+              };
 
-            const actionLabel = isCompleted
-              ? "Revoir"
-              : isStarted
-                ? "Continuer"
-                : "Commencer";
+              const actionLabel = isCompleted
+                ? "revoir"
+                : isStarted
+                  ? "continuer"
+                  : "commencer";
 
-            return (
-              <Link
-                key={exercise.id}
-                href={`/exercises/${exercise.id}`}
-                className={`grid-card-enter group relative flex min-h-[164px] flex-col rounded-xl border border-foreground/8 bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg ${
-                  isCompleted
-                    ? "bg-gradient-to-br from-white to-success/[0.04] ring-1 ring-success/15"
-                    : isStarted
-                      ? "ring-1 ring-warning/20 shadow-sm"
-                      : "shadow-sm"
-                }`}
-                style={{ animationDelay: `${index * 0.03}s` }}
-              >
-                <div className="mb-3 flex items-start justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/35 transition-colors group-hover:text-primary/70">
-                    {String(exercise.number).padStart(2, "0")}
-                  </span>
-                  {isCompleted && (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-success/10">
+              return (
+                <Link
+                  key={exercise.id}
+                  href={`/exercises/${exercise.id}`}
+                  className={`grid-card-enter group relative flex min-h-[164px] flex-col rounded-xl bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg shadow-sm`}
+                  style={{
+                    animationDelay: `${index * 0.03}s`,
+                    border: `1.5px solid #F2C073`,
+                  }}
+                >
+                  <div className="mb-3 flex items-start justify-between">
+                    <span className="text-xs font-semibold uppercase tracking-[0.16em] transition-colors" style={{ color: '#F2C073' }}>
+                      {String(exercise.number).padStart(2, "0")}
+                    </span>
+                    {isCompleted && (
+                      <img
+                        src="/icons/solar/crabe content valide.png"
+                        alt="Validé"
+                        className="w-8 h-8 object-contain"
+                      />
+                    )}
+                    {isStarted && (
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warning/10">
+                        <span className="h-2.5 w-2.5 rounded-full bg-warning" />
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="mb-auto leading-snug font-medium text-foreground transition-colors group-hover:text-foreground/80">
+                    {exercise.title}
+                  </h3>
+
+                  <div className="mt-4 flex items-center justify-between border-t pt-3" style={{ borderColor: '#F2C07340' }}>
+                    <span
+                      className="inline-block rounded-md px-2.5 py-1 text-xs font-medium"
+                      style={{ color: '#F2C073' }}
+                    >
+                      {type.label}
+                    </span>
+
+                    <span className="flex items-center gap-1 text-xs font-semibold transition-colors" style={{ color: '#F2C073' }}>
+                      {actionLabel}
                       <svg
-                        className="h-3.5 w-3.5 text-success"
+                        className="h-3.5 w-3.5 translate-x-0 transition-transform group-hover:translate-x-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -181,57 +247,23 @@ export default async function ExercisesPage() {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={2.5}
-                          d="M5 13l4 4L19 7"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
                         />
                       </svg>
                     </span>
-                  )}
-                  {isStarted && (
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warning/10">
-                      <span className="h-2.5 w-2.5 rounded-full bg-warning" />
-                    </span>
-                  )}
-                </div>
-
-                <h3 className="mb-auto leading-snug font-medium text-foreground transition-colors group-hover:text-primary">
-                  {exercise.title}
-                </h3>
-
-                <div className="mt-4 flex items-center justify-between border-t border-foreground/8 pt-3">
-                  <span
-                    className={`inline-block rounded-md px-2.5 py-1 text-xs font-medium ${type.bg} ${type.text}`}
-                  >
-                    {type.label}
-                  </span>
-
-                  <span className="flex items-center gap-1 text-xs font-semibold text-primary/30 transition-colors group-hover:text-primary">
-                    {actionLabel}
-                    <svg
-                      className="h-3.5 w-3.5 translate-x-0 transition-transform group-hover:translate-x-0.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        {exercises.length === 0 && (
-          <div className="mt-10 rounded-3xl border border-dashed border-foreground/15 bg-white/70 px-6 py-14 text-center shadow-sm">
-            <p className="text-foreground/45">Les exercices seront bientôt disponibles.</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        )}
+
+          {exercises.length === 0 && (
+            <div className="mt-10 rounded-3xl border border-dashed bg-white/70 px-6 py-14 text-center shadow-sm" style={{ borderColor: '#F2C07360' }}>
+              <p className="text-foreground/45">Les exercices seront bientôt disponibles.</p>
+            </div>
+          )}
+        </div>
       </main>
     </>
   );

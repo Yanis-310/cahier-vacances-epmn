@@ -9,6 +9,10 @@
   --color-success: #16A34A;
   --color-error: #DC2626;
   --color-warning: #F59E0B;
+  --color-solar-bg: #FCF4E8;
+  --color-solar-title: #F2C073;
+  --color-solar-btn: #F2C073;
+  --color-solar-btn-hover: #E5AD5E;
   --font-sans: var(--font-inter);
 }
 
@@ -524,8 +528,13 @@ textarea:focus {
    ═══════════════════════════════════════ */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
@@ -533,6 +542,7 @@ textarea:focus {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -544,6 +554,7 @@ textarea:focus {
     opacity: 0;
     transform: translateY(-16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -569,4 +580,27 @@ textarea:focus {
     background-size: cover;
     background-position: center center;
   }
+}
+
+/* ═══════════════════════════════════════
+   SOLAR THEME — Landing buttons
+   ═══════════════════════════════════════ */
+
+.btn-solar-primary {
+  background-color: #F2C073 !important;
+  color: white !important;
+}
+
+.btn-solar-primary:hover {
+  background-color: #E5AD5E !important;
+}
+
+.btn-solar-outline {
+  border: 2px solid #F2C073 !important;
+  color: #F2C073 !important;
+  background-color: transparent !important;
+}
+
+.btn-solar-outline:hover {
+  background-color: rgba(242, 192, 115, 0.1) !important;
 }
