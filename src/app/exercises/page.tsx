@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import SwimmingFish from "@/components/SwimmingFish";
 
 const typeConfig: Record<string, { label: string; color: string }> = {
   single_choice: {
@@ -113,6 +114,8 @@ export default async function ExercisesPage() {
     <>
       <Navbar />
       <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#FCF4E8' }}>
+        <SwimmingFish />
+        <SwimmingFish />
         {/* Decorative palm tree — right side, near card bottom */}
         <img
           src="/icons/solar/palmiersurf 1.png"
