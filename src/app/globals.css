@@ -68,11 +68,11 @@ textarea:focus {
 }
 
 .exercise-solar .exercise-container {
-  background: white;
-  border: 1.5px solid #F2C073;
-  border-radius: 16px;
+  background: linear-gradient(180deg, #fffdf8 0%, #ffffff 40%);
+  border: 1.5px solid #f2c073;
+  border-radius: 20px;
   padding: 24px 20px;
-  box-shadow: 0 10px 24px rgba(242, 192, 115, 0.14);
+  box-shadow: 0 8px 24px rgba(242, 192, 115, 0.12);
 }
 
 @media (min-width: 640px) {
@@ -82,8 +82,113 @@ textarea:focus {
 }
 
 .exercise-solar .exercise-card {
-  border: 1.5px solid #F2C073;
-  box-shadow: 0 6px 18px rgba(242, 192, 115, 0.12);
+  border: 1.5px solid #f2c073;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(242, 192, 115, 0.1);
+}
+
+.exercise-solar .exercise-task-hint {
+  border: 1px solid #f6ddb8;
+  background: #fff7ea;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.exercise-solar .exercise-task-hint-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a1773f;
+  margin-bottom: 4px;
+}
+
+.exercise-solar .exercise-task-hint p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #7f6a48;
+}
+
+.exercise-solar h1 span.text-primary {
+  color: #f2c073;
+}
+
+.exercise-solar .exercise-nav-btn {
+  border: 1.5px solid #f2c073;
+  color: #9f7a45;
+  background: #fff;
+}
+
+.exercise-solar .exercise-nav-btn:hover:not(:disabled) {
+  border-color: #e5ad5e;
+  color: #8a6a3d;
+  background: #fff8ec;
+}
+
+.exercise-solar .exercise-nav-btn-primary {
+  border-color: #f2c073;
+  background: #f2c073;
+  color: #fff;
+}
+
+.exercise-solar .exercise-nav-btn-primary:hover:not(:disabled) {
+  border-color: #e5ad5e;
+  background: #e5ad5e;
+}
+
+.exercise-solar .exercise-pill,
+.exercise-solar .exercise-option-card,
+.exercise-solar .exercise-tf-card,
+.exercise-solar .exercise-textarea {
+  border-color: #f3d6a6;
+  background: #fff;
+}
+
+.exercise-solar .exercise-option-card {
+  min-height: 56px;
+  padding: 14px 14px;
+  border-width: 1.5px;
+}
+
+.exercise-solar .exercise-pill:hover,
+.exercise-solar .exercise-option-card:hover,
+.exercise-solar .exercise-tf-card:hover {
+  border-color: #f2c073;
+  background: #fff8ec;
+}
+
+.exercise-solar .exercise-pill-active,
+.exercise-solar .exercise-option-card-active,
+.exercise-solar .exercise-tf-card-active {
+  border-color: #f2c073;
+  background: #f2c073;
+  color: #fff;
+}
+
+.exercise-solar .exercise-option-card-active .exercise-option-label,
+.exercise-solar .exercise-checkbox-active {
+  background: #d9a861;
+  border-color: #d9a861;
+}
+
+.exercise-solar .exercise-option-label {
+  background: #fdf1dd;
+  color: #b2854a;
+}
+
+.exercise-solar .exercise-dot-current {
+  background: #e5ad5e;
+}
+
+.exercise-solar .exercise-dot-answered {
+  background: #f2c073aa;
+}
+
+.exercise-solar .exercise-exnav-btn:hover {
+  color: #a1773f;
+  background: #fff3df;
 }
 
 /* Card */

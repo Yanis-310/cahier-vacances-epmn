@@ -39,16 +39,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 relative" style={{ backgroundColor: "#FCF4E8" }}>
       <Toast
         message={toastMessage}
         variant="error"
         onClose={() => setToastMessage(null)}
       />
 
-      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md">
+
+
+      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md relative z-10" style={{ border: "1.5px solid #F2C073" }}>
+        <img
+          src="/icons/solar/fleur 1.png"
+          alt=""
+          className="absolute object-contain pointer-events-none z-20"
+          style={{ top: "-40px", right: "-40px", width: "100px", height: "100px" }}
+        />
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-primary">
+          <Link href="/" className="text-2xl font-bold" style={{ color: "#F2C073" }}>
             EPMN
           </Link>
           <h1 className="text-xl font-semibold mt-4">Se connecter</h1>
@@ -81,7 +89,8 @@ export default function LoginPage() {
               required
               aria-invalid={!!error}
               aria-describedby={error ? "login-feedback" : undefined}
-              className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+              style={{ borderColor: "#F2C07360" }}
             />
           </div>
 
@@ -100,14 +109,16 @@ export default function LoginPage() {
               required
               aria-invalid={!!error}
               aria-describedby={error ? "login-feedback" : undefined}
-              className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+              style={{ borderColor: "#F2C07360" }}
             />
           </div>
 
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-sm text-primary hover:underline"
+              className="text-sm hover:underline"
+              style={{ color: "#F2C073" }}
             >
               Mot de passe oublié ?
             </Link>
@@ -116,7 +127,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
+            className="w-full text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
+            style={{ backgroundColor: "#F2C073" }}
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
@@ -124,7 +136,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-foreground/70 mt-6">
           Pas encore de compte ?{" "}
-          <Link href="/register" className="text-primary hover:underline">
+          <Link href="/register" className="hover:underline" style={{ color: "#F2C073" }}>
             Créer un compte
           </Link>
         </p>

@@ -29,7 +29,7 @@ function ResetPasswordForm() {
           variant="error"
           className="mb-2"
         />
-        <Link href="/forgot-password" className="text-primary hover:underline text-sm">
+        <Link href="/forgot-password" className="hover:underline text-sm" style={{ color: "#F2C073" }}>
           Demander un nouveau lien
         </Link>
       </div>
@@ -102,7 +102,8 @@ function ResetPasswordForm() {
         />
         <Link
           href="/login"
-          className="inline-block bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2"
+          className="inline-block text-white px-6 py-2.5 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          style={{ backgroundColor: "#F2C073" }}
         >
           Se connecter
         </Link>
@@ -144,7 +145,8 @@ function ResetPasswordForm() {
             onChange={(e) => setPassword(e.target.value)}
             aria-invalid={!!error}
             aria-describedby={error ? "reset-feedback" : undefined}
-            className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+            style={{ borderColor: "#F2C07360" }}
           />
           {password.length > 0 && (
             <ul className="text-xs mt-1.5 space-y-0.5">
@@ -181,21 +183,23 @@ function ResetPasswordForm() {
             minLength={8}
             aria-invalid={!!error}
             aria-describedby={error ? "reset-feedback" : undefined}
-            className="w-full px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+            style={{ borderColor: "#F2C07360" }}
           />
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:bg-primary-light transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
+          className="w-full text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 cursor-pointer disabled:cursor-not-allowed"
+          style={{ backgroundColor: "#F2C073" }}
         >
           {loading ? "Réinitialisation..." : "Réinitialiser le mot de passe"}
         </button>
       </form>
 
       <p className="text-center text-sm text-foreground/70 mt-6">
-        <Link href="/login" className="text-primary hover:underline">
+        <Link href="/login" className="hover:underline" style={{ color: "#F2C073" }}>
           Retour à la connexion
         </Link>
       </p>
@@ -205,10 +209,16 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 relative" style={{ backgroundColor: "#FCF4E8" }}>
+      <img
+        src="/icons/solar/fleur 1.png"
+        alt=""
+        className="absolute object-contain pointer-events-none hidden sm:block"
+        style={{ top: "16%", right: "18%", width: "120px", height: "120px" }}
+      />
+      <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-md relative z-10" style={{ border: "1.5px solid #F2C073" }}>
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-primary">
+          <Link href="/" className="text-2xl font-bold" style={{ color: "#F2C073" }}>
             EPMN
           </Link>
           <h1 className="text-xl font-semibold mt-4">
@@ -222,7 +232,7 @@ export default function ResetPasswordPage() {
         <Suspense
           fallback={
             <div className="text-center" role="status" aria-live="polite">
-              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-primary/25 border-t-primary" />
+              <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2" style={{ borderColor: "#F2C07355", borderTopColor: "#F2C073" }} />
               <span className="text-foreground/70">Chargement en cours...</span>
             </div>
           }

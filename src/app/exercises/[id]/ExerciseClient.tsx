@@ -40,6 +40,15 @@ interface Props {
   nextId: string | null;
 }
 
+function getResponseHint(type: string): string {
+  if (type === "single_choice") return "Choisissez une seule reponse.";
+  if (type === "qcm") return "Selectionnez la proposition la plus juste.";
+  if (type === "multi_select") return "Activez ou desactivez cette proposition.";
+  if (type === "true_false") return "Choisissez entre Vrai et Faux.";
+  if (type === "free_text") return "Redigez une reponse claire et concise.";
+  return "Repondez a la question pour avancer.";
+}
+
 export default function ExerciseClient({
   exercise,
   savedAnswers,
@@ -477,6 +486,7 @@ export default function ExerciseClient({
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const score = showCorrection ? computeScore() : null;
+  const responseHint = getResponseHint(exercise.type);
 
   // ─── CORRECTION MODE: Show all questions with results ───
   if (showCorrection) {
@@ -718,11 +728,15 @@ export default function ExerciseClient({
 
       {/* Exercise header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
           <span className="text-primary">Exercice {exercise.number}</span>
           <span className="text-foreground/20 mx-2">—</span>
           <span className="text-foreground/80">{exercise.title}</span>
         </h1>
+
+        <p className="mt-2 text-sm text-foreground/50">
+          Repondez question par question. Vos reponses sont enregistrees automatiquement.
+        </p>
 
         {exercise.content.instruction && (
           <p className="text-foreground/50 mt-2 text-[15px] leading-relaxed">
@@ -741,7 +755,7 @@ export default function ExerciseClient({
 
       {/* Progress bar */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex-1 h-1 bg-foreground/[0.06] rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-foreground/[0.06] rounded-full overflow-hidden">
           <div
             className="h-full bg-primary/80 rounded-full transition-all duration-500 ease-out"
             style={{
@@ -778,32 +792,40 @@ export default function ExerciseClient({
             }`}
         >
           {/* Question number badge */}
-          <div className="flex items-center gap-2.5 mb-5">
-            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold">
+          <div className="flex items-center gap-3 mb-5">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-semibold">
               {currentIndex + 1}
             </span>
-            <span className="text-xs text-foreground/35 font-medium">
+            <span className="text-sm text-foreground/45 font-medium">
               Question {currentIndex + 1} sur {totalQuestions}
             </span>
           </div>
 
           {/* Question text */}
-          <p className="text-[16px] font-medium leading-relaxed text-foreground/90 mb-6">
+          <p className="text-lg font-semibold leading-relaxed text-foreground/90 mb-4">
             {currentQuestion.text}
           </p>
 
+          <div className="exercise-task-hint mb-5">
+            <span className="exercise-task-hint-label">Ce que vous devez faire</span>
+            <p>{responseHint}</p>
+          </div>
+
           {/* ─── SINGLE CHOICE: Pills ─── */}
           {exercise.type === "single_choice" && (
-            <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 gap-2">
-              {options.map((opt) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {options.map((opt, optIndex) => {
                 const isSelected = userAnswers[currentQuestion.id] === opt;
                 return (
                   <button
                     key={opt}
                     onClick={() => handleAnswer(currentQuestion.id, opt)}
-                    className={`exercise-pill ${isSelected ? "exercise-pill-active" : ""}`}
+                    className={`exercise-option-card ${isSelected ? "exercise-option-card-active" : ""}`}
                   >
-                    {opt}
+                    <span className="exercise-option-label">
+                      {String.fromCharCode(65 + optIndex)}
+                    </span>
+                    <span className="text-[14px] leading-snug">{opt}</span>
                   </button>
                 );
               })}
@@ -927,7 +949,7 @@ export default function ExerciseClient({
       )}
 
       {/* Navigation footer */}
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between rounded-xl border border-[#f3d6a6] bg-[#fffaf1] px-3 py-3">
         {/* Previous button */}
         <button
           onClick={() => navigateTo(currentIndex - 1, "right")}

@@ -26,6 +26,14 @@ interface Props {
   total: number;
 }
 
+function getResponseHint(type: string): string {
+  if (type === "single_choice") return "Choisissez une seule reponse.";
+  if (type === "qcm") return "Selectionnez la proposition la plus juste.";
+  if (type === "multi_select") return "Activez ou desactivez cette proposition.";
+  if (type === "true_false") return "Choisissez entre Vrai et Faux.";
+  return "Repondez a la question pour avancer.";
+}
+
 export default function EvaluationClient({
   evaluationId,
   questions,
@@ -86,6 +94,7 @@ export default function EvaluationClient({
   const currentQuestion = questions[currentIndex];
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === total - 1;
+  const responseHint = currentQuestion ? getResponseHint(currentQuestion.exerciseType) : "";
 
   const autoAdvanceTypes = ["single_choice", "qcm", "true_false"];
 
@@ -192,11 +201,14 @@ export default function EvaluationClient({
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
           <span className="text-primary">Évaluation</span>
           <span className="text-foreground/20 mx-2">—</span>
           <span className="text-foreground/80">{total} questions</span>
         </h1>
+        <p className="mt-2 text-sm text-foreground/50">
+          Repondez dans l&apos;ordre, puis soumettez votre session en fin de parcours.
+        </p>
       </div>
 
       {/* Restored banner */}
@@ -216,7 +228,7 @@ export default function EvaluationClient({
 
       {/* Progress bar */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex-1 h-1 bg-foreground/[0.06] rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-foreground/[0.06] rounded-full overflow-hidden">
           <div
             className="h-full bg-primary/80 rounded-full transition-all duration-500 ease-out"
             style={{
@@ -240,11 +252,11 @@ export default function EvaluationClient({
             }`}
         >
           {/* Question number badge + source */}
-          <div className="flex items-center gap-2.5 mb-2">
-            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-semibold">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-semibold">
               {currentIndex + 1}
             </span>
-            <span className="text-xs text-foreground/35 font-medium">
+            <span className="text-sm text-foreground/45 font-medium">
               Question {currentIndex + 1} sur {total}
             </span>
           </div>
@@ -255,14 +267,19 @@ export default function EvaluationClient({
           </p>
 
           {/* Question text */}
-          <p className="text-[16px] font-medium leading-relaxed text-foreground/90 mb-6">
+          <p className="text-lg font-semibold leading-relaxed text-foreground/90 mb-4">
             {currentQuestion.questionText}
           </p>
 
+          <div className="exercise-task-hint mb-5">
+            <span className="exercise-task-hint-label">Ce que vous devez faire</span>
+            <p>{responseHint}</p>
+          </div>
+
           {/* ─── SINGLE CHOICE: Pills ─── */}
           {currentQuestion.exerciseType === "single_choice" && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {currentQuestion.options.map((opt) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {currentQuestion.options.map((opt, optIndex) => {
                 const isSelected = answers[currentQuestion.key] === opt;
                 return (
                   <button
@@ -270,9 +287,12 @@ export default function EvaluationClient({
                     key={opt}
                     onClick={() => handleAnswer(currentQuestion.key, opt)}
                     aria-pressed={isSelected}
-                    className={`exercise-pill ${isSelected ? "exercise-pill-active" : ""}`}
+                    className={`exercise-option-card ${isSelected ? "exercise-option-card-active" : ""}`}
                   >
-                    {opt}
+                    <span className="exercise-option-label">
+                      {String.fromCharCode(65 + optIndex)}
+                    </span>
+                    <span className="text-[14px] leading-snug">{opt}</span>
                   </button>
                 );
               })}
@@ -377,7 +397,7 @@ export default function EvaluationClient({
       )}
 
       {/* Navigation footer */}
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between rounded-xl border border-[#f3d6a6] bg-[#fffaf1] px-3 py-3">
         {/* Previous button */}
         <button
           type="button"
@@ -393,7 +413,7 @@ export default function EvaluationClient({
         </button>
 
         {/* Dots */}
-        <div className="flex items-center gap-1 flex-wrap justify-center max-w-[60%]">
+        <div className="exercise-dots-container">
           {questions.map((q, i) => {
             const isAnswered = !!answers[q.key]?.trim();
             const isCurrent = i === currentIndex;
