@@ -67,12 +67,35 @@ export default async function EvaluationTakePage({
   return (
     <>
       <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <EvaluationClient
-          evaluationId={evaluation.id}
-          questions={questions}
-          total={questions.length}
-        />
+      <main className="min-h-screen relative" style={{ backgroundColor: "#FCF4E8" }}>
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 relative z-10">
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-10"
+            style={{ top: "230px", right: "-190px", width: "220px" }}
+          />
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-10"
+            style={{ top: "330px", left: "-200px", width: "210px", transform: "scaleX(-1)" }}
+          />
+          <img
+            src="/icons/solar/fleur 1.png"
+            alt=""
+            className="absolute object-contain pointer-events-none z-20"
+            style={{ top: "-46px", right: "-34px", width: "130px", height: "130px" }}
+          />
+
+          <section className="exercise-solar">
+            <EvaluationClient
+              evaluationId={evaluation.id}
+              questions={questions}
+              total={questions.length}
+            />
+          </section>
+        </div>
       </main>
     </>
   );

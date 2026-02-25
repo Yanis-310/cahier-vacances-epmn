@@ -51,11 +51,11 @@ export default function StartButton({
         onClick={handleStart}
         disabled={loading}
         aria-busy={loading}
-        className={`px-6 py-3 rounded-xl font-medium transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 ${
-          variant === "outline"
-            ? "border border-foreground/20 text-foreground/70 hover:text-primary hover:border-primary/40 bg-white"
-            : "bg-primary text-white hover:bg-primary-light"
-        }`}
+        className={`px-6 py-3 rounded-xl font-medium transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${variant === "outline"
+            ? "border border-foreground/20 text-foreground/70 hover:border-[#F2C073] hover:text-[#F2C073] bg-white"
+            : "text-white hover:opacity-90"
+          }`}
+        style={variant === "primary" ? { backgroundColor: '#F2C073' } : undefined}
       >
         {loading ? "Préparation..." : "Nouvelle évaluation"}
       </button>

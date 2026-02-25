@@ -60,6 +60,32 @@ textarea:focus {
   max-width: 100%;
 }
 
+/* Scoped solar variant for exercise/evaluation take pages */
+.exercise-solar {
+  --color-primary: #F2C073;
+  --color-primary-light: #E5AD5E;
+  --color-primary-pale: #FFF4E6;
+}
+
+.exercise-solar .exercise-container {
+  background: white;
+  border: 1.5px solid #F2C073;
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 10px 24px rgba(242, 192, 115, 0.14);
+}
+
+@media (min-width: 640px) {
+  .exercise-solar .exercise-container {
+    padding: 30px 28px;
+  }
+}
+
+.exercise-solar .exercise-card {
+  border: 1.5px solid #F2C073;
+  box-shadow: 0 6px 18px rgba(242, 192, 115, 0.12);
+}
+
 /* Card */
 .exercise-card {
   background: white;

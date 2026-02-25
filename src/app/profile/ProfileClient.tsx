@@ -23,10 +23,10 @@ function InfoCard({
   hint?: string;
 }) {
   return (
-    <div className="rounded-xl border border-foreground/8 bg-white p-5 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/35">{label}</p>
+    <div className="rounded-xl bg-white p-5 shadow-sm" style={{ border: '1.5px solid #F2C073' }}>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/60">{label}</p>
       <p className="mt-2 text-lg font-semibold text-foreground">{value}</p>
-      {hint && <p className="mt-1 text-sm text-foreground/45">{hint}</p>}
+      {hint && <p className="mt-1 text-sm text-foreground/60">{hint}</p>}
     </div>
   );
 }
@@ -118,9 +118,9 @@ export default function ProfileClient({ user }: ProfileClientProps) {
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <aside className="space-y-4 lg:col-span-1">
-        <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm">
+        <div className="rounded-2xl bg-white p-6 shadow-sm" style={{ border: '1.5px solid #F2C073' }}>
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: '#F2C073' }}>
               <span className="text-lg font-bold leading-none text-white">{initials}</span>
             </div>
             <div>
@@ -128,7 +128,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
               <p className="text-sm text-foreground/45">{user.email}</p>
             </div>
           </div>
-          <p className="mt-4 border-t border-foreground/8 pt-3 text-xs text-foreground/35">
+          <p className="mt-4 pt-3 text-xs text-foreground/35" style={{ borderTop: '1px solid #F2C07340' }}>
             Membre depuis le {memberSince}
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
         <InfoCard label="Nom" value={name} hint="Affiché dans la navigation" />
         <InfoCard label="Email" value={email} hint="Adresse de connexion" />
 
-        <div className="rounded-2xl border border-foreground/8 bg-white p-4 shadow-sm">
+        <div className="rounded-2xl bg-white p-4 shadow-sm" style={{ border: '1.5px solid #F2C073' }}>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
             className="flex w-full items-center justify-center gap-2 rounded-lg border border-foreground/10 px-4 py-2.5 text-sm font-medium text-foreground/60 transition hover:border-error/30 hover:text-error cursor-pointer"
@@ -163,8 +163,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
             <FeedbackMessage message={success} variant="success" />
           )}
 
-          <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-lg font-semibold text-foreground">Informations personnelles</h2>
+          <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8" style={{ border: '1.5px solid #F2C073' }}>
+            <h2 className="text-lg font-semibold" style={{ color: '#F2C073' }}>Informations personnelles</h2>
             <p className="mt-1 text-sm text-foreground/45">Mettez à jour vos informations de base.</p>
 
             <div className="mt-6 space-y-5">
@@ -198,8 +198,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-foreground/8 bg-white p-6 shadow-sm sm:p-8">
-            <h2 className="text-lg font-semibold text-foreground">Sécurité</h2>
+          <div className="rounded-2xl bg-white p-6 shadow-sm sm:p-8" style={{ border: '1.5px solid #F2C073' }}>
+            <h2 className="text-lg font-semibold" style={{ color: '#F2C073' }}>Sécurité</h2>
             <p className="mt-1 text-sm text-foreground/45">Changez votre mot de passe si nécessaire.</p>
 
             <div className="mt-6 space-y-5">
@@ -274,7 +274,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-primary py-3 font-medium text-white transition-colors hover:bg-primary-light disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            className="w-full rounded-xl py-3 font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+            style={{ backgroundColor: '#F2C073' }}
           >
             {loading ? "Enregistrement..." : "Enregistrer les modifications"}
           </button>
