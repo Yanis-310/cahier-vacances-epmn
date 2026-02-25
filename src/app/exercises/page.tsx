@@ -113,31 +113,46 @@ export default async function ExercisesPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#FCF4E8' }}>
+      <main className="min-h-screen relative" style={{ backgroundColor: '#FCF4E8' }}>
         <SwimmingFish />
         <SwimmingFish />
-        {/* Decorative palm tree — right side, near card bottom */}
-        <img
-          src="/icons/solar/palmiersurf 1.png"
-          alt=""
-          className="hidden lg:block absolute pointer-events-none z-0"
-          style={{ top: '280px', right: '0px', width: '220px' }}
-        />
-        {/* Decorative palm tree — bottom right */}
-        <img
-          src="/icons/solar/palmiersurf 1.png"
-          alt=""
-          className="hidden lg:block absolute bottom-0 right-0 w-44 pointer-events-none z-0"
-          style={{ transform: 'scaleX(-1)' }}
-        />
-        {/* Decorative palm tree — bottom left */}
-        <img
-          src="/icons/solar/palmiersurf 1.png"
-          alt=""
-          className="hidden lg:block absolute bottom-0 left-0 w-40 pointer-events-none z-0"
-        />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+          {/* Decorative palm tree — right side, top area */}
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-20"
+            style={{ top: '220px', right: '-190px', width: '220px' }}
+          />
+          {/* Decorative palm tree — right side, mid-page */}
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-20"
+            style={{ top: '700px', right: '-170px', width: '200px' }}
+          />
+          {/* Decorative palm tree — left side, mid-page */}
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-20"
+            style={{ top: '500px', left: '-190px', width: '220px', transform: 'scaleX(-1)' }}
+          />
+          {/* Decorative palm tree — left side, lower */}
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-20"
+            style={{ top: '1050px', left: '-170px', width: '200px', transform: 'scaleX(-1)' }}
+          />
+          {/* Decorative palm tree — right side, lower */}
+          <img
+            src="/icons/solar/palmiersurf 1.png"
+            alt=""
+            className="hidden lg:block absolute pointer-events-none z-20"
+            style={{ top: '1200px', right: '-160px', width: '190px' }}
+          />
           {/* Section wrapper for hibiscus overflow */}
           <div className="relative">
             {/* Decorative hibiscus — centered on top-right corner of the card */}
