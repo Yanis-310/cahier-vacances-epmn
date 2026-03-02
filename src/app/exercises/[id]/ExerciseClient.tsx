@@ -909,7 +909,7 @@ export default function ExerciseClient({
                 onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
                 onBlur={() => saveAnswers(userAnswers)}
                 onKeyDown={(e) => {
-                  if ((e.ctrlKey || e.metaKey) && e.key === "Enter" && currentIndex < totalQuestions - 1) {
+                  if (e.key === "Enter" && !e.shiftKey && currentIndex < totalQuestions - 1) {
                     e.preventDefault();
                     saveAnswers(userAnswers);
                     navigateTo(currentIndex + 1, "left");
@@ -920,22 +920,10 @@ export default function ExerciseClient({
                 className="exercise-textarea"
               />
               {currentIndex < totalQuestions - 1 && (
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-xs text-foreground/30 hidden sm:inline">
+                <div className="mt-2">
+                  <span className="hidden">
                     Ctrl+Entrée pour passer à la suite
                   </span>
-                  <button
-                    onClick={() => {
-                      saveAnswers(userAnswers);
-                      navigateTo(currentIndex + 1, "left");
-                    }}
-                    className="text-xs text-primary/70 hover:text-primary font-medium flex items-center gap-1 transition-colors ml-auto cursor-pointer"
-                  >
-                    Question suivante
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                      <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
                 </div>
               )}
             </div>
