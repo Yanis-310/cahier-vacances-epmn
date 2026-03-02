@@ -6,13 +6,6 @@ export default function ExerciseLoading() {
       <Navbar />
       <main className="min-h-screen relative" style={{ backgroundColor: "#FCF4E8" }}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 relative z-10">
-          <img
-            src="/icons/solar/fleur 1.png"
-            alt=""
-            className="absolute object-contain pointer-events-none z-20"
-            style={{ top: "-46px", right: "-34px", width: "130px", height: "130px" }}
-          />
-
           <div className="exercise-solar animate-pulse">
             <div className="exercise-container">
           {/* Back link */}

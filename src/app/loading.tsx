@@ -4,13 +4,6 @@ export default function Loading() {
       className="min-h-screen flex items-center justify-center px-4 relative"
       style={{ backgroundColor: "#FCF4E8" }}
     >
-      <img
-        src="/icons/solar/fleur 1.png"
-        alt=""
-        className="absolute object-contain pointer-events-none hidden sm:block"
-        style={{ top: "16%", right: "18%", width: "120px", height: "120px" }}
-      />
-
       <div
         className="text-center max-w-md bg-white rounded-xl shadow-sm p-8 relative z-10"
         style={{ border: "1.5px solid #F2C073" }}
