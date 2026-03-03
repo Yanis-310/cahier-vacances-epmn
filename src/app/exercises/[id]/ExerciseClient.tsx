@@ -43,7 +43,7 @@ interface Props {
 function getResponseHint(type: string): string {
   if (type === "single_choice") return "Choisissez une seule reponse.";
   if (type === "qcm") return "Selectionnez la proposition la plus juste.";
-  if (type === "multi_select") return "Activez ou desactivez cette proposition.";
+  if (type === "multi_select") return "Choisissez Oui ou Non pour cette proposition.";
   if (type === "true_false") return "Choisissez entre Vrai et Faux.";
   if (type === "free_text") return "Redigez une reponse claire et concise.";
   return "Repondez a la question pour avancer.";
@@ -231,12 +231,17 @@ export default function ExerciseClient({
     }
   }
 
-  function handleMultiSelectToggle(questionId: number) {
-    const current = userAnswers[questionId] === "true";
-    const updated = { ...userAnswers, [questionId]: current ? "" : "true" };
+  function handleMultiSelectAnswer(questionId: number, value: "true" | "false") {
+    const updated = { ...userAnswers, [questionId]: value };
     setUserAnswers(updated);
     setShowCorrection(false);
     saveAnswers(updated);
+  }
+
+  function formatMultiSelectAnswer(value: string | undefined) {
+    if (value === "true") return "Oui";
+    if (value === "false") return "Non";
+    return "—";
   }
 
   async function handleCheck() {
@@ -253,7 +258,11 @@ export default function ExerciseClient({
 
     if (exercise.type === "multi_select") {
       const correctIds = (exerciseAnswers as { correctIds: number[] })?.correctIds ?? [];
-      const isSelected = userAnswers[questionId] === "true";
+      const userAnswer = userAnswers[questionId];
+      if (userAnswer !== "true" && userAnswer !== "false") {
+        return "incorrect";
+      }
+      const isSelected = userAnswer === "true";
       const shouldBeSelected = correctIds.includes(questionId);
       return isSelected === shouldBeSelected ? "correct" : "incorrect";
     }
@@ -460,7 +469,12 @@ export default function ExerciseClient({
       }
       if (exercise.type === "multi_select") {
         const correctIds = (exerciseAnswers as { correctIds: number[] })?.correctIds ?? [];
-        const isSelected = userAnswers[q.id] === "true";
+        const userAnswer = userAnswers[q.id];
+        if (userAnswer !== "true" && userAnswer !== "false") {
+          incorrect++;
+          return;
+        }
+        const isSelected = userAnswer === "true";
         const shouldBeSelected = correctIds.includes(q.id);
         if (isSelected === shouldBeSelected) correct++;
         else incorrect++;
@@ -606,7 +620,9 @@ export default function ExerciseClient({
                       Votre réponse :{" "}
                       <span className={`font-medium ${qStatus === "correct" ? "text-success" : qStatus === "incorrect" ? "text-error" : "text-foreground/70"
                         }`}>
-                        {userAnswer || "—"}
+                        {exercise.type === "multi_select"
+                          ? formatMultiSelectAnswer(userAnswer)
+                          : userAnswer || "—"}
                       </span>
                     </p>
 
@@ -624,8 +640,8 @@ export default function ExerciseClient({
                       <div className="exercise-correction mt-2">
                         <p className="text-sm text-foreground/70">
                           {((exerciseAnswers as { correctIds: number[] })?.correctIds ?? []).includes(q.id)
-                            ? "Cette proposition est une bonne posture."
-                            : "Cette proposition n'est pas une bonne posture."}
+                            ? "La bonne reponse etait : Oui."
+                            : "La bonne reponse etait : Non."}
                         </p>
                       </div>
                     )}
@@ -851,23 +867,24 @@ export default function ExerciseClient({
             </div>
           )}
 
-          {/* ─── MULTI SELECT: Checkbox cards ─── */}
+          {/* ─── MULTI SELECT: Oui / Non ─── */}
           {exercise.type === "multi_select" && (
-            <button
-              onClick={() => handleMultiSelectToggle(currentQuestion.id)}
-              className={`exercise-option-card ${userAnswers[currentQuestion.id] === "true" ? "exercise-option-card-active" : ""
-                }`}
-            >
-              <span className={`exercise-checkbox ${userAnswers[currentQuestion.id] === "true" ? "exercise-checkbox-active" : ""
-                }`}>
-                {userAnswers[currentQuestion.id] === "true" && (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span className="text-[14px] leading-snug">Bonne posture pour le MP</span>
-            </button>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => handleMultiSelectAnswer(currentQuestion.id, "true")}
+                className={`exercise-tf-card ${userAnswers[currentQuestion.id] === "true" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                Oui
+              </button>
+              <button
+                onClick={() => handleMultiSelectAnswer(currentQuestion.id, "false")}
+                className={`exercise-tf-card ${userAnswers[currentQuestion.id] === "false" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                Non
+              </button>
+            </div>
           )}
 
           {/* ─── TRUE / FALSE: Two large cards ─── */}

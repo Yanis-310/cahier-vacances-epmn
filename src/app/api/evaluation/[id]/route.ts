@@ -70,6 +70,9 @@ export async function POST(
       if (exercise.type === "multi_select") {
         const correctIds = (exercise.answers as { correctIds: number[] })
           .correctIds;
+        if (userAnswer !== "true" && userAnswer !== "false") {
+          continue;
+        }
         const isSelected = userAnswer === "true";
         const shouldBeSelected = correctIds.includes(qRef.questionId);
         if (isSelected === shouldBeSelected) score++;

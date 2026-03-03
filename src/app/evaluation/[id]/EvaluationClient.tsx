@@ -29,7 +29,7 @@ interface Props {
 function getResponseHint(type: string): string {
   if (type === "single_choice") return "Choisissez une seule reponse.";
   if (type === "qcm") return "Selectionnez la proposition la plus juste.";
-  if (type === "multi_select") return "Activez ou desactivez cette proposition.";
+  if (type === "multi_select") return "Choisissez Oui ou Non pour cette proposition.";
   if (type === "true_false") return "Choisissez entre Vrai et Faux.";
   return "Repondez a la question pour avancer.";
 }
@@ -125,10 +125,9 @@ export default function EvaluationClient({
     }
   }
 
-  function handleMultiSelectToggle(key: string) {
-    const current = answers[key] === "true";
+  function handleMultiSelectAnswer(key: string, value: "true" | "false") {
     setAnswers((prev) => {
-      const updated = { ...prev, [key]: current ? "" : "true" };
+      const updated = { ...prev, [key]: value };
       persistToStorage(updated);
       return updated;
     });
@@ -320,25 +319,28 @@ export default function EvaluationClient({
             </div>
           )}
 
-          {/* ─── MULTI SELECT: Checkbox card ─── */}
+          {/* ─── MULTI SELECT: Oui / Non ─── */}
           {currentQuestion.exerciseType === "multi_select" && (
-            <button
-              type="button"
-              onClick={() => handleMultiSelectToggle(currentQuestion.key)}
-              aria-pressed={answers[currentQuestion.key] === "true"}
-              className={`exercise-option-card ${answers[currentQuestion.key] === "true" ? "exercise-option-card-active" : ""
-                }`}
-            >
-              <span className={`exercise-checkbox ${answers[currentQuestion.key] === "true" ? "exercise-checkbox-active" : ""
-                }`}>
-                {answers[currentQuestion.key] === "true" && (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </span>
-              <span className="text-[14px] leading-snug">Bonne posture pour le MP</span>
-            </button>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => handleMultiSelectAnswer(currentQuestion.key, "true")}
+                aria-pressed={answers[currentQuestion.key] === "true"}
+                className={`exercise-tf-card ${answers[currentQuestion.key] === "true" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                Oui
+              </button>
+              <button
+                type="button"
+                onClick={() => handleMultiSelectAnswer(currentQuestion.key, "false")}
+                aria-pressed={answers[currentQuestion.key] === "false"}
+                className={`exercise-tf-card ${answers[currentQuestion.key] === "false" ? "exercise-tf-card-active" : ""
+                  }`}
+              >
+                Non
+              </button>
+            </div>
           )}
 
           {/* ─── TRUE / FALSE: Two large cards ─── */}

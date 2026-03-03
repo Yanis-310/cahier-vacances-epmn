@@ -25,6 +25,12 @@ function getMessage(pct: number): string {
   return "Continuez vos revisions.";
 }
 
+function formatMultiSelectAnswer(value: string): string {
+  if (value === "true") return "Oui";
+  if (value === "false") return "Non";
+  return "-";
+}
+
 export default async function EvaluationResultPage({
   params,
 }: {
@@ -70,9 +76,13 @@ export default async function EvaluationResultPage({
       if (exercise.type === "multi_select") {
         const correctIds = (exercise.answers as { correctIds: number[] }).correctIds;
         const shouldBeSelected = correctIds.includes(qRef.questionId);
-        const isSelected = userAnswer === "true";
-        isCorrect = isSelected === shouldBeSelected;
-        correctAnswer = shouldBeSelected ? "Bonne posture" : "Pas une bonne posture";
+        if (userAnswer !== "true" && userAnswer !== "false") {
+          isCorrect = false;
+        } else {
+          const isSelected = userAnswer === "true";
+          isCorrect = isSelected === shouldBeSelected;
+        }
+        correctAnswer = shouldBeSelected ? "Oui" : "Non";
       } else {
         correctAnswer = (exercise.answers as Record<string, string>)[String(qRef.questionId)];
         isCorrect = userAnswer === correctAnswer;
@@ -273,9 +283,7 @@ export default async function EvaluationResultPage({
                           <span className="text-foreground/50">Votre reponse :</span>{" "}
                           <span className={d.isCorrect ? "text-success font-medium" : "text-error font-medium"}>
                             {d.exerciseType === "multi_select"
-                              ? d.userAnswer === "true"
-                                ? "Bonne posture"
-                                : "Pas une bonne posture"
+                              ? formatMultiSelectAnswer(d.userAnswer)
                               : d.userAnswer || "-"}
                           </span>
                         </p>
