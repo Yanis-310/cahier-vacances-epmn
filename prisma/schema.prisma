@@ -40,6 +40,7 @@ model Exercise {
   title    String
   type     ExerciseType
   isActive Boolean        @default(true)
+  deletedAt DateTime?
   content  Json
   answers  Json
   progress UserProgress[]
