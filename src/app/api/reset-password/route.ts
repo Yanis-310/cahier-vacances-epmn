@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import {
@@ -31,6 +32,10 @@ const RESET_PASSWORD_RATE_LIMIT = getRateLimitOptionsFromEnv(
   }
 );
 
+function hashResetToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
 export async function POST(request: Request) {
   const rateKey = getClientIp(request);
   const rate = limitRate("reset-password", rateKey, RESET_PASSWORD_RATE_LIMIT);
@@ -60,10 +65,11 @@ export async function POST(request: Request) {
   }
 
   const { token, password } = parsed.data;
+  const hashedToken = hashResetToken(token);
 
   try {
     const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
+      where: { tokenHash: hashedToken },
     });
 
     if (!resetToken || resetToken.expiresAt < new Date()) {

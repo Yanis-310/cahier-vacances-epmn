@@ -23,6 +23,10 @@ const FORGOT_PASSWORD_RATE_LIMIT = getRateLimitOptionsFromEnv(
   }
 );
 
+function hashResetToken(token: string) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
 export async function POST(request: Request) {
   const rateKey = getClientIp(request);
   const rate = limitRate("forgot-password", rateKey, FORGOT_PASSWORD_RATE_LIMIT);
@@ -63,12 +67,13 @@ export async function POST(request: Request) {
       });
 
       const token = crypto.randomBytes(32).toString("hex");
+      const tokenHash = hashResetToken(token);
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
       await prisma.passwordResetToken.create({
         data: {
           userId: user.id,
-          token,
+          tokenHash,
           expiresAt,
         },
       });
