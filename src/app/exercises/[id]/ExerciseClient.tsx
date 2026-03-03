@@ -236,6 +236,10 @@ export default function ExerciseClient({
     setUserAnswers(updated);
     setShowCorrection(false);
     saveAnswers(updated);
+
+    if (exercise.number === 11 && currentIndex < totalQuestions - 1) {
+      navigateTo(currentIndex + 1, "left");
+    }
   }
 
   function formatMultiSelectAnswer(value: string | undefined) {
