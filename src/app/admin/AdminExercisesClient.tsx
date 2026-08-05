@@ -382,7 +382,7 @@ export default function AdminExercisesClient({
       content: {
         ...(instruction ? { instruction } : {}),
         ...(legend ? { legend } : {}),
-        columns: { left: "Propos", right: "Reformulation" },
+        columns: { left: "Propos", right: "Proposition" },
         questions: normalizedQuestions.map((q) => ({ id: q.id, text: q.text })),
       },
       answers: Object.fromEntries(
