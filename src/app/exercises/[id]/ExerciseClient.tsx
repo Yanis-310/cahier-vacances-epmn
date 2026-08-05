@@ -282,6 +282,53 @@ export default function ExerciseClient({
     (k) => userAnswers[k]?.trim()
   ).length;
 
+  function handleRestart() {
+    setShowRestartModal(true);
+  }
+
+  async function confirmRestart() {
+    setShowRestartModal(false);
+    setUserAnswers({});
+    setShowCorrection(false);
+    if (!isLabyrinth) {
+      setExerciseAnswers(null);
+    }
+    setCurrentIndex(0);
+    await saveAnswers({}, false);
+  }
+
+  const restartModal = showRestartModal ? (
+    <div className="restart-modal-overlay" onClick={() => setShowRestartModal(false)}>
+      <div className="restart-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="restart-modal-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M3.5 14C3.5 8.201 8.201 3.5 14 3.5C19.799 3.5 24.5 8.201 24.5 14C24.5 19.799 19.799 24.5 14 24.5C9.625 24.5 5.95 21.875 4.375 18.375" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M3.5 7V14H10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <h3 className="restart-modal-title">Recommencer cet exercice ?</h3>
+        <p className="restart-modal-text">
+          Vos réponses pour <strong>cet exercice uniquement</strong> seront effacées. 
+          Les autres exercices ne sont pas concernés.
+        </p>
+        <div className="restart-modal-actions">
+          <button
+            onClick={() => setShowRestartModal(false)}
+            className="restart-modal-btn restart-modal-btn-cancel"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={confirmRestart}
+            className="restart-modal-btn restart-modal-btn-confirm"
+          >
+            Recommencer cet exercice
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   // ─── LABYRINTH RENDERING (preserved as-is) ───
   if (isLabyrinth) {
     return (
@@ -508,52 +555,6 @@ export default function ExerciseClient({
     return { correct, incorrect, total: correct + incorrect };
   };
 
-  function handleRestart() {
-    setShowRestartModal(true);
-  }
-
-  async function confirmRestart() {
-    setShowRestartModal(false);
-    setUserAnswers({});
-    setShowCorrection(false);
-    if (!isLabyrinth) {
-      setExerciseAnswers(null);
-    }
-    setCurrentIndex(0);
-    await saveAnswers({}, false);
-  }
-
-  const restartModal = showRestartModal ? (
-    <div className="restart-modal-overlay" onClick={() => setShowRestartModal(false)}>
-      <div className="restart-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="restart-modal-icon">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <path d="M3.5 14C3.5 8.201 8.201 3.5 14 3.5C19.799 3.5 24.5 8.201 24.5 14C24.5 19.799 19.799 24.5 14 24.5C9.625 24.5 5.95 21.875 4.375 18.375" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M3.5 7V14H10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-        <h3 className="restart-modal-title">Recommencer cet exercice ?</h3>
-        <p className="restart-modal-text">
-          Vos réponses pour <strong>cet exercice uniquement</strong> seront effacées. 
-          Les autres exercices ne sont pas concernés.
-        </p>
-        <div className="restart-modal-actions">
-          <button
-            onClick={() => setShowRestartModal(false)}
-            className="restart-modal-btn restart-modal-btn-cancel"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={confirmRestart}
-            className="restart-modal-btn restart-modal-btn-confirm"
-          >
-            Recommencer cet exercice
-          </button>
-        </div>
-      </div>
-    </div>
-  ) : null;
 
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === totalQuestions - 1;
