@@ -735,3 +735,114 @@ textarea:focus {
 .btn-solar-outline:hover {
   background-color: rgba(242, 192, 115, 0.1) !important;
 }
+
+/* ═══════════════════════════════════════
+   RESTART CONFIRMATION MODAL
+   ═══════════════════════════════════════ */
+
+.restart-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  animation: restart-overlay-in 0.2s ease-out;
+  padding: 16px;
+}
+
+.restart-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: restart-modal-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+}
+
+.restart-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-primary-pale);
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.restart-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin-bottom: 8px;
+}
+
+.restart-modal-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(31, 41, 55, 0.6);
+  margin-bottom: 24px;
+}
+
+.restart-modal-text strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.restart-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.restart-modal-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.restart-modal-btn-cancel {
+  background: rgba(31, 41, 55, 0.06);
+  color: rgba(31, 41, 55, 0.6);
+}
+
+.restart-modal-btn-cancel:hover {
+  background: rgba(31, 41, 55, 0.1);
+  color: rgba(31, 41, 55, 0.8);
+}
+
+.restart-modal-btn-confirm {
+  background: var(--color-primary);
+  color: white;
+}
+
+.restart-modal-btn-confirm:hover {
+  background: var(--color-primary-light);
+  box-shadow: 0 2px 8px rgba(5, 105, 200, 0.3);
+}
+
+@keyframes restart-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes restart-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

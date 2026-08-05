@@ -70,6 +70,7 @@ export default function ExerciseClient({
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [pageTransition, setPageTransition] = useState<"enter" | "exit" | null>("enter");
+  const [showRestartModal, setShowRestartModal] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
@@ -284,6 +285,8 @@ export default function ExerciseClient({
   // ─── LABYRINTH RENDERING (preserved as-is) ───
   if (isLabyrinth) {
     return (
+      <>
+      {restartModal}
       <div className={`exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
         <div className="mb-8">
           <Link
@@ -469,6 +472,7 @@ export default function ExerciseClient({
           </div>
         </div>
       </div>
+      </>
     );
   }
 
@@ -504,8 +508,12 @@ export default function ExerciseClient({
     return { correct, incorrect, total: correct + incorrect };
   };
 
-  async function handleRestart() {
-    if (!confirm("Recommencer cet exercice ? Toutes vos réponses seront effacées.")) return;
+  function handleRestart() {
+    setShowRestartModal(true);
+  }
+
+  async function confirmRestart() {
+    setShowRestartModal(false);
     setUserAnswers({});
     setShowCorrection(false);
     if (!isLabyrinth) {
@@ -515,6 +523,38 @@ export default function ExerciseClient({
     await saveAnswers({}, false);
   }
 
+  const restartModal = showRestartModal ? (
+    <div className="restart-modal-overlay" onClick={() => setShowRestartModal(false)}>
+      <div className="restart-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="restart-modal-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M3.5 14C3.5 8.201 8.201 3.5 14 3.5C19.799 3.5 24.5 8.201 24.5 14C24.5 19.799 19.799 24.5 14 24.5C9.625 24.5 5.95 21.875 4.375 18.375" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path d="M3.5 7V14H10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <h3 className="restart-modal-title">Recommencer cet exercice ?</h3>
+        <p className="restart-modal-text">
+          Vos réponses pour <strong>cet exercice uniquement</strong> seront effacées. 
+          Les autres exercices ne sont pas concernés.
+        </p>
+        <div className="restart-modal-actions">
+          <button
+            onClick={() => setShowRestartModal(false)}
+            className="restart-modal-btn restart-modal-btn-cancel"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={confirmRestart}
+            className="restart-modal-btn restart-modal-btn-confirm"
+          >
+            Recommencer
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   const isFirstQuestion = currentIndex === 0;
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const score = showCorrection ? computeScore() : null;
@@ -523,6 +563,8 @@ export default function ExerciseClient({
   // ─── CORRECTION MODE: Show all questions with results ───
   if (showCorrection) {
     return (
+      <>
+      {restartModal}
       <div className={`exercise-container exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
         {/* Back link */}
         <Link
@@ -743,11 +785,14 @@ export default function ExerciseClient({
           ) : <span />}
         </div>
       </div>
+      </>
     );
   }
 
   // ─── NORMAL QUIZ MODE: One question at a time ───
   return (
+    <>
+    {restartModal}
     <div className={`exercise-container exercise-page-transition ${pageTransition === "enter" ? "exercise-page-enter" : pageTransition === "exit" ? "exercise-page-exit" : ""}`}>
       {/* Back link */}
       <Link
@@ -1059,5 +1104,6 @@ export default function ExerciseClient({
         ) : <span />}
       </div>
     </div>
+    </>
   );
 }
