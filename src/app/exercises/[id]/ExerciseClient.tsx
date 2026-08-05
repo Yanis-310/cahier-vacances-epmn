@@ -438,6 +438,18 @@ export default function ExerciseClient({
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex gap-3">
+            {allLabStepsCorrect && (
+              <button
+                onClick={handleRestart}
+                className="px-5 py-2.5 border border-foreground/20 rounded-lg hover:bg-white transition-colors cursor-pointer inline-flex items-center gap-2"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8C2 4.686 4.686 2 8 2C11.314 2 14 4.686 14 8C14 11.314 11.314 14 8 14C5.5 14 3.4 12.5 2.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  <path d="M2 4V8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Recommencer
+              </button>
+            )}
             {prevId && (
               <button
                 onClick={() => navigateToExercise(`/exercises/${prevId}`)}
@@ -496,7 +508,9 @@ export default function ExerciseClient({
     if (!confirm("Recommencer cet exercice ? Toutes vos réponses seront effacées.")) return;
     setUserAnswers({});
     setShowCorrection(false);
-    setExerciseAnswers(null);
+    if (!isLabyrinth) {
+      setExerciseAnswers(null);
+    }
     setCurrentIndex(0);
     await saveAnswers({}, false);
   }
