@@ -450,7 +450,7 @@ export default function ExerciseClient({
                   <path d="M2 8C2 4.686 4.686 2 8 2C11.314 2 14 4.686 14 8C14 11.314 11.314 14 8 14C5.5 14 3.4 12.5 2.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   <path d="M2 4V8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                Recommencer
+                Recommencer cet exercice
               </button>
             )}
             {prevId && (
@@ -548,7 +548,7 @@ export default function ExerciseClient({
             onClick={confirmRestart}
             className="restart-modal-btn restart-modal-btn-confirm"
           >
-            Recommencer
+            Recommencer cet exercice
           </button>
         </div>
       </div>
@@ -743,7 +743,7 @@ export default function ExerciseClient({
               <path d="M2 8C2 4.686 4.686 2 8 2C11.314 2 14 4.686 14 8C14 11.314 11.314 14 8 14C5.5 14 3.4 12.5 2.5 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               <path d="M2 4V8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Recommencer
+            Recommencer cet exercice
           </button>
 
           {nextId && (
