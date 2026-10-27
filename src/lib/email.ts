@@ -11,7 +11,8 @@ function getResend() {
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   const resend = getResend();
   await resend.emails.send({
-    from: "EPMN Cahier de Vacances <onboarding@resend.dev>",
+    // Must be an address on a domain verified in Resend; the resend.dev sandbox only delivers to the account owner.
+    from: process.env.EMAIL_FROM || "EPMN Cahier de Vacances <onboarding@resend.dev>",
     to,
     subject: "Réinitialisation de votre mot de passe",
     html: `
