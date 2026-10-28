@@ -16,6 +16,7 @@ export default async function EvaluationTakePage({
 }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  if (!session.user.hasAccess) redirect("/paiement");
 
   const { id } = await params;
 

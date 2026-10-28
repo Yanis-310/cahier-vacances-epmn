@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import type { UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { authorizeCredentials } from "@/lib/auth-credentials";
+import { hasPaidAccess } from "@/lib/payment";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -55,6 +56,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.name) session.user.name = token.name;
       if (token.email) session.user.email = token.email;
       session.user.role = (token.role as UserRole | undefined) ?? "USER";
+      session.user.hasAccess = hasPaidAccess({
+        role: session.user.role,
+        paidAt: token.paidAt,
+      });
       return session;
     },
     async jwt({ token, user }) {
@@ -66,12 +71,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.sub) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.sub },
-          select: { name: true, email: true, role: true },
+          select: { name: true, email: true, role: true, paidAt: true },
         });
         if (dbUser) {
           token.name = dbUser.name;
           token.email = dbUser.email;
           token.role = dbUser.role;
+          token.paidAt = dbUser.paidAt?.toISOString() ?? null;
         }
       }
       return token;

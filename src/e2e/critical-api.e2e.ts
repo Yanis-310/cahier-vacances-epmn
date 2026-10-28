@@ -217,6 +217,26 @@ test(
       const successfulLogin = await loginWithCredentials(email, password);
       assert.equal(successfulLogin.response.status, 200);
 
+      const unpaidProgressResponse = await fetchWithJar(
+        `${baseUrl}/api/progress`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            exerciseId,
+            userAnswers: { "1": "A" },
+            completed: true,
+          }),
+        },
+        successfulLogin.jar
+      );
+      assert.equal(unpaidProgressResponse.status, 403);
+
+      await prisma.user.update({
+        where: { email },
+        data: { paidAt: new Date() },
+      });
+
       const progressResponse = await fetchWithJar(
         `${baseUrl}/api/progress`,
         {

@@ -22,7 +22,7 @@ npm run seed           # prisma/seed.ts — WIPES evaluations, progress and exer
 npx prisma migrate dev # apply/create migrations (schema in prisma/schema.prisma)
 ```
 
-Env vars (in `.env*`, gitignored): `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `RESEND_API_KEY`. Optional: `EMAIL_FROM` (sender on a Resend-verified domain; required in production, the default resend.dev sender only delivers to the Resend account owner), `E2E_BASE_URL`.
+Env vars (in `.env*`, gitignored): `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`. Optional: `EMAIL_FROM` (sender on a Resend-verified domain; required in production, the default resend.dev sender only delivers to the Resend account owner), `E2E_BASE_URL`.
 
 Local dev note: if the repo lives on an exFAT drive, `next build` (Turbopack) fails creating junction points; this is environmental, not a code issue.
 
@@ -31,6 +31,8 @@ Local dev note: if the repo lives on an exFAT drive, `next build` (Turbopack) fa
 **Testable handler pattern.** API logic lives in `src/lib/*.ts` (e.g. `api-progress.ts`, `api-register.ts`, `admin-exercise.ts`) as pure functions that take the parsed body plus a `deps` object (Prisma calls, `revalidatePath`, etc.) and return `{ status, body }`. The route files in `src/app/api/**/route.ts` stay thin: they authenticate, parse JSON, wire real Prisma calls into `deps` and convert the result to `NextResponse`. Unit tests in `src/lib/*.test.ts` inject fake deps, so new API logic should follow this split to stay testable without a database.
 
 **Auth and roles.** `src/lib/auth.ts` configures NextAuth with a credentials provider (bcrypt). The `jwt` callback re-reads name/email/role from the DB on every call, so role changes take effect immediately. Roles: `USER`, `ADMIN`, `OWNER`. There is no middleware: admin pages are guarded in `src/app/admin/layout.tsx`, and admin API routes call `requireAdmin()` / `requireOwner()` from `src/lib/access-control.ts`, which throw `AuthorizationError` (401/403). `src/lib/rate-limit.ts` is an in-memory per-scope limiter used on auth-related endpoints.
+
+**Paid access (Stripe).** One-time payment via Stripe Checkout. `User.paidAt` grants access; the `jwt` callback re-reads it and exposes `session.user.hasAccess` (always true for `ADMIN`/`OWNER`, see `hasPaidAccess` in `src/lib/payment.ts`). Exercise/evaluation pages and the dashboard redirect unpaid users to `/paiement`; `/api/progress` and `/api/evaluation*` return 403. Access is granted by the webhook `POST /api/stripe/webhook` (`checkout.session.completed`) and, as a fallback, by `/paiement/succes`, which re-fetches the Checkout session from Stripe server-side. Local webhook testing: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
 
 **Exercise data model.** `Exercise` has a unique `number` (ordering and prev/next navigation), a `type` enum (`single_choice`, `qcm`, `multi_select`, `true_false`, `free_text`, `labyrinth`), and two untyped JSON columns:
 - `content`: typically `{ instruction, questions: [{ id, text, ... }], options? }`; the shape varies by type.

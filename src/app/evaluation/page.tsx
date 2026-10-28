@@ -165,6 +165,7 @@ function MetricCard({
 export default async function EvaluationPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  if (!session.user.hasAccess) redirect("/paiement");
 
   const evaluations = await prisma.evaluation.findMany({
     where: { userId: session.user.id },

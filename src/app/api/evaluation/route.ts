@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PAYMENT_REQUIRED_ERROR } from "@/lib/payment";
 
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+  if (!session.user.hasAccess) {
+    return NextResponse.json({ error: PAYMENT_REQUIRED_ERROR }, { status: 403 });
   }
 
   try {

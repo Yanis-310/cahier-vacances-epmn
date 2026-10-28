@@ -80,6 +80,9 @@ export default async function ExercisesPage() {
   if (!session?.user) {
     redirect("/login");
   }
+  if (!session.user.hasAccess) {
+    redirect("/paiement");
+  }
 
   const [exercises, progress] = await Promise.all([
     prisma.exercise.findMany({

@@ -14,6 +14,8 @@ model User {
   passwordHash String
   role         UserRole       @default(USER)
   createdAt    DateTime       @default(now())
+  paidAt       DateTime?
+  stripeCheckoutSessionId String? @unique
   progress     UserProgress[]
   evaluations  Evaluation[]
   resetTokens  PasswordResetToken[]

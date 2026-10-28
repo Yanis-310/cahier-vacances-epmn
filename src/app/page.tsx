@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,6 +9,7 @@ export default async function Home() {
   const session = await auth();
 
   if (session?.user?.id) {
+    if (!session.user.hasAccess) redirect("/paiement");
     return <Dashboard userId={session.user.id} userName={session.user.name || "Utilisateur"} />;
   }
 

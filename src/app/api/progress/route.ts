@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PAYMENT_REQUIRED_ERROR } from "@/lib/payment";
 import { handleProgressUpdate } from "@/lib/api-progress";
 
 export async function POST(request: Request) {
@@ -9,6 +10,9 @@ export async function POST(request: Request) {
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+  if (!session.user.hasAccess) {
+    return NextResponse.json({ error: PAYMENT_REQUIRED_ERROR }, { status: 403 });
   }
 
   let body: unknown;
