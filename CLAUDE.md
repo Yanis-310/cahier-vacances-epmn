@@ -13,7 +13,9 @@ Stack: Next.js 16 (App Router) + React 19, NextAuth v5 (beta, credentials/JWT), 
 ```bash
 npm run dev            # Next dev server (localhost:3000)
 npm run dev:nofork     # Custom single-process dev server (scripts/dev-no-fork.mjs); honors HOST/PORT
+npm run dev:webpack    # Next dev with webpack instead of Turbopack (needed on exFAT drives)
 npm run build          # prisma generate && next build
+                       # (Vercel runs `vercel-build` instead, which also applies migrations on production deploys)
 npm run lint           # eslint (CI runs lint + test on Node 20)
 npm test               # unit tests: tsx --test src/lib/*.test.ts (node:test, no DB needed)
 npx tsx --test src/lib/api-progress.test.ts   # run a single test file
@@ -24,7 +26,7 @@ npx prisma migrate dev # apply/create migrations (schema in prisma/schema.prisma
 
 Env vars (in `.env*`, gitignored): `DATABASE_URL`, `AUTH_SECRET`, `NEXTAUTH_URL`, `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`. Optional: `EMAIL_FROM` (sender on a Resend-verified domain; required in production, the default resend.dev sender only delivers to the Resend account owner), `E2E_BASE_URL`.
 
-Local dev note: if the repo lives on an exFAT drive, `next build` (Turbopack) fails creating junction points; this is environmental, not a code issue.
+Local dev note: if the repo lives on an exFAT drive, Turbopack (`next dev`, `next build`) fails creating junction points; this is environmental, not a code issue. Use `npm run dev:webpack` locally.
 
 ## Architecture
 
