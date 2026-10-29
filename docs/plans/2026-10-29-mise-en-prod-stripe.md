@@ -20,7 +20,7 @@
 
 ### 2. Vrai compte Stripe, en mode live (avec le dirigeant)
 - [ ] **Activer le compte** : infos entreprise, représentant légal, IBAN
-- [ ] Créer le **produit** + un **prix ponctuel** → noter le `price_...`
+- [x] Créer le **produit** + un **prix ponctuel** → `price_1UVrzbF8xdtvRcRQN3rzSVvN` (live, créé le 29/10)
 - [ ] Récupérer la **clé secrète** `sk_live_...` (Développeurs → Clés API)
 - [ ] Créer le **webhook** (Développeurs → Webhooks → Ajouter une destination) :
   - URL : `https://<domaine>/api/stripe/webhook`
@@ -29,7 +29,7 @@
 
 ### 3. Variables d'environnement sur Vercel (Production)
 - [ ] `STRIPE_SECRET_KEY` = `sk_live_...`
-- [ ] `STRIPE_PRICE_ID` = `price_...`
+- [ ] `STRIPE_PRICE_ID` = `price_1UVrzbF8xdtvRcRQN3rzSVvN`
 - [ ] `STRIPE_WEBHOOK_SECRET` = `whsec_...` (celui du webhook live, pas celui de `stripe listen`)
 
 ### 4. E-mails (mot de passe oublié)
