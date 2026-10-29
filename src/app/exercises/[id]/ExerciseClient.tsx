@@ -758,6 +758,17 @@ export default function ExerciseClient({
               </svg>
             </button>
           )}
+          {!nextId && (
+            <button
+              onClick={() => navigateToExercise("/conclusion")}
+              className="exercise-nav-btn exercise-nav-btn-primary w-full sm:w-auto justify-center cursor-pointer"
+            >
+              Terminer le cahier
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Exercise navigation */}

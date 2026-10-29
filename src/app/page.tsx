@@ -56,7 +56,7 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href={lastProgress ? `/exercises/${lastProgress.exercise.id}` : "/exercises"}
+                href={lastProgress ? `/exercises/${lastProgress.exercise.id}` : "/preambule"}
                 className="btn-solar-primary px-8 py-3 rounded-lg text-lg font-medium transition-colors"
               >
                 {lastProgress ? "Reprendre les exercices" : "Commencer les exercices"}
@@ -97,7 +97,7 @@ async function Dashboard({ userId, userName }: { userId: string; userName: strin
 
             {/* Exercises Card */}
             <Link
-              href={lastProgress ? `/exercises/${lastProgress.exercise.id}` : "/exercises"}
+              href={lastProgress ? `/exercises/${lastProgress.exercise.id}` : "/preambule"}
               className="group bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden"
               style={{ border: "1.5px solid #F2C073" }}
             >

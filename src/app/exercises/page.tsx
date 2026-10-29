@@ -181,6 +181,12 @@ export default async function ExercisesPage() {
                         Révisez à votre rythme les fondamentaux de la médiation professionnelle.
                       </p>
                       <p className="mt-2 text-sm text-foreground/40">{getMotivation(progressPercent)}</p>
+                      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm font-semibold" style={{ color: '#F2C073' }}>
+                        <Link href="/preambule" className="hover:underline">Lire le préambule</Link>
+                        {exercises.length > 0 && completedCount >= exercises.length && (
+                          <Link href="/conclusion" className="hover:underline">Lire le mot de la fin</Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
