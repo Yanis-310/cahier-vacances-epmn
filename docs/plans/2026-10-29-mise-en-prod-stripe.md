@@ -44,7 +44,9 @@ Après la mise en ligne, tout compte USER sans paiement est renvoyé vers `/paie
 ### 6. Mise en ligne (avec Claude)
 - [ ] Fusionner `feature/stripe-paiement` dans `master` → Vercel déploie
 - [ ] Vérifier que le build passe. Si erreur Prisma **P3005** (base créée sans migrations) → la résoudre avec Claude ; le site actuel reste en ligne tant que le build échoue
-- [ ] Si option A : lancer le script des anciens utilisateurs
+- [ ] Si option A : lancer le script des anciens utilisateurs (`DATABASE_URL` de prod) :
+  - simulation : `npx tsx scripts/grant-access-existing-users.ts --avant=<date de mise en ligne>`
+  - puis pour de vrai : même commande + `--apply`
 - [ ] Faire un **vrai paiement** avec une vraie carte sur le site en ligne
 - [ ] Vérifier dans Stripe → Webhooks que l'événement a bien reçu une réponse **200**
 - [ ] Vérifier que le compte a accès aux exercices
