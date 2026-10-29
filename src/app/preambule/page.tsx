@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -11,13 +10,6 @@ export default async function PreambulePage() {
   if (!session?.user) redirect("/login");
   if (!session.user.hasAccess) redirect("/paiement");
 
-  const firstExercise = await prisma.exercise.findFirst({
-    where: { isActive: true },
-    orderBy: { number: "asc" },
-    select: { id: true },
-  });
-  const startHref = firstExercise ? `/exercises/${firstExercise.id}` : "/exercises";
-
   return (
     <>
       <Navbar />
@@ -27,25 +19,19 @@ export default async function PreambulePage() {
           style={{ border: "1.5px solid #F2C073" }}
         >
           <div className="mb-6 text-right">
-            <Link href={startHref} className="text-sm font-semibold hover:underline" style={{ color: "#F2C073" }}>
+            <Link href="/exercises" className="text-sm font-semibold hover:underline" style={{ color: "#F2C073" }}>
               Passer directement aux exercices →
             </Link>
           </div>
 
           <TexteCahierView texte={PREAMBULE} />
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-8 flex justify-center">
             <Link
-              href={startHref}
+              href="/exercises"
               className="btn-solar-primary px-6 py-3 rounded-lg font-medium text-center"
             >
               Commencer les exercices
-            </Link>
-            <Link
-              href="/exercises"
-              className="btn-solar-outline px-6 py-3 rounded-lg font-medium text-center"
-            >
-              Voir tous les exercices
             </Link>
           </div>
 
