@@ -8,6 +8,7 @@ type AdminUser = {
   email: string;
   role: "OWNER" | "ADMIN" | "USER";
   createdAt: string;
+  access: "role" | "stripe" | "offered" | "none";
 };
 
 type Stats = {
@@ -67,9 +68,11 @@ const PER_PAGE = 10;
 export default function AdminUsersClient({
   initialUsers,
   stats,
+  canManageRoles,
 }: {
   initialUsers: AdminUser[];
   stats: Stats;
+  canManageRoles: boolean;
 }) {
   const [users, setUsers] = useState(initialUsers);
   const [loading, setLoading] = useState(false);
@@ -122,6 +125,33 @@ export default function AdminUsersClient({
         nextRole === "ADMIN"
           ? `${user.email} promu admin.`
           : `${user.email} rétrogradé utilisateur.`
+      );
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "Erreur.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function updateAccess(user: AdminUser, granted: boolean) {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const response = await fetch(`/api/admin/users/${user.id}/access`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ granted }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(data.error ?? "Mise a jour impossible.");
+      }
+      await reloadUsers();
+      setSuccess(
+        granted
+          ? `Accès offert à ${user.email}.`
+          : `Accès retiré à ${user.email}.`
       );
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : "Erreur.");
@@ -193,6 +223,7 @@ export default function AdminUsersClient({
                 <th className="px-5 py-3">Utilisateur</th>
                 <th className="px-5 py-3">Email</th>
                 <th className="px-5 py-3">Rôle</th>
+                <th className="px-5 py-3">Accès</th>
                 <th className="px-5 py-3">Date de création</th>
                 <th className="px-5 py-3">Actions</th>
               </tr>
@@ -239,11 +270,47 @@ export default function AdminUsersClient({
                       </span>
                     )}
                   </td>
+                  {/* Access */}
+                  <td className="px-5 py-4">
+                    {user.access === "role" && (
+                      <span className="text-xs text-slate-400">Inclus (admin)</span>
+                    )}
+                    {user.access === "stripe" && (
+                      <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase text-emerald-700">
+                        Payé
+                      </span>
+                    )}
+                    {user.access === "offered" && (
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex rounded-full bg-purple-50 px-2.5 py-1 text-[10px] font-bold uppercase text-purple-700">
+                          Offert
+                        </span>
+                        <button
+                          type="button"
+                          disabled={loading}
+                          onClick={() => updateAccess(user, false)}
+                          className="text-xs font-medium text-slate-500 underline-offset-2 hover:underline disabled:opacity-50"
+                        >
+                          Retirer
+                        </button>
+                      </div>
+                    )}
+                    {user.access === "none" && (
+                      <button
+                        type="button"
+                        disabled={loading}
+                        onClick={() => updateAccess(user, true)}
+                        className="rounded-full border border-emerald-500 px-4 py-1.5 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-50 disabled:opacity-50"
+                      >
+                        Offrir l&apos;accès
+                      </button>
+                    )}
+                  </td>
                   {/* Date */}
                   <td className="px-5 py-4 text-slate-500">{formatDate(user.createdAt)}</td>
                   {/* Actions */}
                   <td className="px-5 py-4">
-                    {user.role === "USER" && (
+                    {canManageRoles && user.role === "USER" && (
                       <button
                         type="button"
                         disabled={loading}
@@ -253,7 +320,7 @@ export default function AdminUsersClient({
                         Promouvoir admin
                       </button>
                     )}
-                    {user.role === "ADMIN" && (
+                    {canManageRoles && user.role === "ADMIN" && (
                       <button
                         type="button"
                         disabled={loading}
@@ -268,7 +335,7 @@ export default function AdminUsersClient({
               ))}
               {filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-5 py-12 text-center text-sm text-slate-400">
+                  <td colSpan={6} className="px-5 py-12 text-center text-sm text-slate-400">
                     Aucun utilisateur correspondant.
                   </td>
                 </tr>

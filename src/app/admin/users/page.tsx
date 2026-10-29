@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { isOwnerRole } from "@/lib/access-control";
+import { isAdminRole, isOwnerRole } from "@/lib/access-control";
+import { accessStatus } from "@/lib/admin-user";
 import { prisma } from "@/lib/prisma";
 import AdminUsersClient from "./AdminUsersClient";
 
@@ -9,7 +10,7 @@ export default async function AdminUsersPage() {
   if (!session?.user) {
     redirect("/login");
   }
-  if (!isOwnerRole(session.user.role)) {
+  if (!isAdminRole(session.user.role)) {
     redirect("/admin");
   }
 
@@ -25,6 +26,8 @@ export default async function AdminUsersPage() {
         email: true,
         role: true,
         createdAt: true,
+        paidAt: true,
+        stripeCheckoutSessionId: true,
       },
     }),
     prisma.user.count({
@@ -37,10 +40,12 @@ export default async function AdminUsersPage() {
 
   return (
     <AdminUsersClient
-      initialUsers={users.map((user) => ({
+      initialUsers={users.map(({ paidAt, stripeCheckoutSessionId, ...user }) => ({
         ...user,
         createdAt: user.createdAt.toISOString(),
+        access: accessStatus({ role: user.role, paidAt, stripeCheckoutSessionId }),
       }))}
+      canManageRoles={isOwnerRole(session.user.role)}
       stats={{
         total: users.length,
         admins: adminCount,
