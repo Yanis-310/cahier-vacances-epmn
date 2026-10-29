@@ -19,7 +19,7 @@
 - [ ] Sur Vercel (Production) : `NEXTAUTH_URL=https://<domaine>`
 
 ### 2. Vrai compte Stripe, en mode live (avec le dirigeant)
-- [ ] **Activer le compte** : infos entreprise, représentant légal, IBAN
+- [x] **Activer le compte** : infos entreprise, représentant légal, IBAN (fait le 29/10)
 - [x] Créer le **produit** + un **prix ponctuel** → `price_1UVrzbF8xdtvRcRQN3rzSVvN` (live, créé le 29/10)
 - [ ] Récupérer la **clé secrète** `sk_live_...` (Développeurs → Clés API)
 - [ ] Créer le **webhook** (Développeurs → Webhooks → Ajouter une destination) :
