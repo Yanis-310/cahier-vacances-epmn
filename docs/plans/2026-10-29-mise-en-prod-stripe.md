@@ -38,13 +38,13 @@
 
 ### 5. Décision : utilisateurs déjà inscrits
 Après la mise en ligne, tout compte USER sans paiement est renvoyé vers `/paiement`, y compris les anciens.
-- [ ] **Option A** : on leur offre l'accès → Claude écrit un script qui remplit `paidAt` pour eux
-- [ ] **Option B** : ils doivent payer → rien à faire
+- [x] **Décidé le 29/10 : option A**, les comptes existants gardent leur accès (script `scripts/grant-access-existing-users.ts`, à lancer à l'étape 6)
+- Ensuite, pour offrir l'accès à quelqu'un : il crée son compte, puis un admin ou l'owner clique **« Offrir l'accès »** dans Admin → Utilisateurs (bouton « Retirer » pour l'annuler ; un accès payé par Stripe ne peut pas être retiré)
 
 ### 6. Mise en ligne (avec Claude)
 - [ ] Fusionner `feature/stripe-paiement` dans `master` → Vercel déploie
 - [ ] Vérifier que le build passe. Si erreur Prisma **P3005** (base créée sans migrations) → la résoudre avec Claude ; le site actuel reste en ligne tant que le build échoue
-- [ ] Si option A : lancer le script des anciens utilisateurs (`DATABASE_URL` de prod) :
+- [ ] Lancer le script des anciens utilisateurs (`DATABASE_URL` de prod) :
   - simulation : `npx tsx scripts/grant-access-existing-users.ts --avant=<date de mise en ligne>`
   - puis pour de vrai : même commande + `--apply`
 - [ ] Faire un **vrai paiement** avec une vraie carte sur le site en ligne
